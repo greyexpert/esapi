@@ -1,0 +1,31 @@
+{
+    "name": "everywhere-solutions/api",
+    "authors": [
+        {
+            "name": "Sergey Kambalin",
+            "email": "greyexpert@gmail.com"
+        }
+    ],
+
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./lib/graphql-php",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+
+    "require": {
+        "slim/slim": "^3.8",
+        "webonyx/graphql-php": "dev-feature/extensions"
+    },
+    "autoload": {
+        "psr-4": {
+            "Everywhere\\Messenger\\": "messenger/",
+            "Everywhere\\Api\\": "api/",
+            "Everywhere\\Oxwall\\": "src/"
+        }
+    }
+}
