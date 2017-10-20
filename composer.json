@@ -19,7 +19,7 @@
 
     "require": {
         "slim/slim": "^3.8",
-        "webonyx/graphql-php": "dev-feature/extensions"
+        "webonyx/graphql-php": "dev-master"
     },
     "autoload": {
         "psr-4": {

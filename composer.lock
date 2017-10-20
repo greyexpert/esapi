@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3894ab9d300c4d8c90449af8b241bce",
+    "content-hash": "b0529bc879804bff11df9b8824356130",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -302,11 +302,11 @@
         },
         {
             "name": "webonyx/graphql-php",
-            "version": "dev-feature/extensions",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "./lib/graphql-php",
-                "reference": "0c3a6578003b53df1a282b8071bb324d2b4bb5c4",
+                "reference": "9f949114b6b1cabecd8641c77fc3d09aede9dd0c",
                 "shasum": null
             },
             "require": {
