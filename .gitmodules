@@ -1,0 +1,3 @@
+[submodule "lib/graphql-php"]
+	path = lib/graphql-php
+	url = https://github.com/greyexpert/graphql-php
