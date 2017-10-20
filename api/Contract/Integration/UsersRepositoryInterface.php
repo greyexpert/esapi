@@ -8,15 +8,13 @@
 
 namespace Everywhere\Api\Contract\Integration;
 
-use Everywhere\Api\Entities\User;
-
 interface UsersRepositoryInterface
 {
     /**
-     * @param $id
-     * @return User
+     * @param $idList
+     * @return array<User>
      */
-    public function findById($id);
+    public function findByIdList($idList);
 
     /**
      * @return array<User>

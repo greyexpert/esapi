@@ -16,19 +16,28 @@ class UsersRepository implements UsersRepositoryInterface
 {
     public $counter = 0;
 
-    public function findById($id)
+    public function findByIdList($idList)
     {
         $this->counter++;
 
-        $userDto = \BOL_UserService::getInstance()->findUserById($id);
+        $userDtoList = \BOL_UserService::getInstance()->findUserListByIdList($idList);
 
-        $user = new User();
+        $users = [];
 
-        $user->id = $userDto->id;
-        $user->name = \BOL_UserService::getInstance()->getDisplayName($userDto->id);
-        $user->email = $userDto->email;
+        /**
+         * @var $userDto \BOL_User
+         */
+        foreach ($userDtoList as $userDto) {
+            $user = new User();
 
-        return $user;
+            $user->id = $userDto->id;
+            $user->name = \BOL_UserService::getInstance()->getDisplayName($userDto->id);
+            $user->email = $userDto->email;
+
+            $users[$userDto->id] = $user;
+        }
+
+        return $users;
     }
 
     public function findAllIds()
