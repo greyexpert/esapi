@@ -8,16 +8,14 @@
 
 namespace Everywhere\Api\Contract\Integration;
 
-interface UsersRepositoryInterface
-{
-    /**
-     * @param $idList
-     * @return array<User>
-     */
-    public function findByIdList($idList);
+use Everywhere\Api\Contract\Schema\EntitySourceInterface;
 
+interface UsersRepositoryInterface extends EntitySourceInterface
+{
     /**
      * @return array<User>
      */
     public function findAllIds();
+
+    public function findFriendIds($userId);
 }

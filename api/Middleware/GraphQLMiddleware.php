@@ -9,6 +9,7 @@
 namespace Everywhere\Api\Middleware;
 
 use Everywhere\Api\Contract\Schema\BuilderInterface;
+use GraphQL\Server\ServerConfig;
 use Overblog\DataLoader\Promise\Adapter\Webonyx\GraphQL\SyncPromiseAdapter;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
@@ -22,13 +23,9 @@ class GraphQLMiddleware
      */
     private $server;
 
-    public function __construct(BuilderInterface $builder)
+    public function __construct(ServerConfig $serverConfigs)
     {
-
-        $this->server = new StandardServer([
-            "schema" => $builder->build(),
-            "promiseAdapter" => new SyncPromiseAdapter()
-        ]);
+        $this->server = new StandardServer($serverConfigs);
     }
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response)

@@ -8,62 +8,39 @@
 
 namespace Everywhere\Api\Schema\Resolvers;
 
+use Everywhere\Api\Contract\Entities\EntityInterface;
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
-use Everywhere\Api\Contract\Schema\ResolverInterface;
+use Everywhere\Api\Contract\Schema\EntityLoaderFactoryInterface;
 use Everywhere\Api\Entities\User;
-use GraphQL\Executor\Promise\Promise;
-use GraphQL\Type\Definition\ResolveInfo;
-
-use Overblog\DataLoader\DataLoader;
-use Overblog\DataLoader\Promise\Adapter\Webonyx\GraphQL\SyncPromiseAdapter;
-use Overblog\PromiseAdapter\Adapter\WebonyxGraphQLSyncPromiseAdapter;
+use Everywhere\Api\Schema\EntityResolver;
 
 
-class UserResolver implements ResolverInterface
+class UserResolver extends EntityResolver
 {
     /**
      * @var UsersRepositoryInterface
      */
     protected $usersRepository;
 
-    /**
-     * @var DataLoader
-     */
-    protected $userLoader;
+    public function __construct(UsersRepositoryInterface $usersRepository, EntityLoaderFactoryInterface $loaderFactory) {
+        parent::__construct(
+            $loaderFactory->create($usersRepository)
+        );
 
-    /**
-     * @var WebonyxGraphQLSyncPromiseAdapter
-     */
-    protected $promiseAdapter;
-
-    public function __construct(UsersRepositoryInterface $usersRepository)
-    {
         $this->usersRepository = $usersRepository;
-        $graphQLPromiseAdapter = new SyncPromiseAdapter();
-        $promiseAdapter = new WebonyxGraphQLSyncPromiseAdapter($graphQLPromiseAdapter);
-
-        $this->userLoader = new DataLoader(function($ids) use ($usersRepository, $promiseAdapter) {
-            $users = $usersRepository->findByIdList($ids);
-
-            return $promiseAdapter->createFulfilled(array_map(function($id) use ($users) {
-                return $users[$id];
-            }, $ids));
-        }, $promiseAdapter);
-
-        $this->promiseAdapter = $promiseAdapter;
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $info)
+    /**
+     * @param User $user
+     * @param $fieldName
+     * @return mixed|null
+     */
+    public function resolveField($user, $fieldName)
     {
-        /**
-         * @var Promise
-         */
-        $promise = $root instanceof User
-            ? $this->promiseAdapter->createFulfilled($root)
-            : $this->userLoader->load($root);
+        if ($fieldName === "friends") {
+            return $this->usersRepository->findFriendIds($user->id);
+        }
 
-        return $promise->then(function($user) use ($info) {
-            return $user->{$info->fieldName};
-        });
+        return parent::resolveField($user, $fieldName);
     }
 }

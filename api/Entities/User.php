@@ -9,13 +9,8 @@
 namespace Everywhere\Api\Entities;
 
 
-class User
+class User extends AbstractEntity
 {
-    /**
-     * @var int
-     */
-    public $id;
-
     /**
      * @var string
      */
