@@ -3,9 +3,9 @@
 namespace Everywhere\Api;
 
 use Everywhere\Api\Contract\App\ContainerInterface;
-use Everywhere\Api\Contract\Schema\EntityLoaderFactoryInterface;
+use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
-use Everywhere\Api\Schema\EntityResolver;
+use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\EntityLoaderFactory;
 use Everywhere\Api\Schema\Resolvers\QueryResolver;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
@@ -13,7 +13,6 @@ use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
 use Everywhere\Api\Schema\Builder;
 use Everywhere\Api\Schema\Resolvers\UserResolver;
 use Everywhere\Api\Schema\TypeDecorator;
-use GraphQL\Error\UserError;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use Overblog\DataLoader\Promise\Adapter\Webonyx\GraphQL\SyncPromiseAdapter;
@@ -53,8 +52,8 @@ return [
         );
     },
 
-    EntityLoaderFactoryInterface::class => function(ContainerInterface $container) {
-        return new EntityLoaderFactory(
+    DataLoaderFactoryInterface::class => function(ContainerInterface $container) {
+        return new DataLoaderFactory(
             $container[PromiseAdapter::class]
         );
     },
@@ -68,7 +67,7 @@ return [
     UserResolver::class => function(ContainerInterface $container) {
         return new UserResolver(
             $container->getIntegration()->getUsersRepository(),
-            $container[EntityLoaderFactoryInterface::class]
+            $container[DataLoaderFactoryInterface::class]
         );
     }
 ];

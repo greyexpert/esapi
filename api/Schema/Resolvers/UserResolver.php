@@ -8,26 +8,29 @@
 
 namespace Everywhere\Api\Schema\Resolvers;
 
-use Everywhere\Api\Contract\Entities\EntityInterface;
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
-use Everywhere\Api\Contract\Schema\EntityLoaderFactoryInterface;
+use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Entities\User;
+use Everywhere\Api\Schema\DataLoader;
 use Everywhere\Api\Schema\EntityResolver;
-
 
 class UserResolver extends EntityResolver
 {
     /**
-     * @var UsersRepositoryInterface
+     * @var DataLoader
      */
-    protected $usersRepository;
+    protected $friendListLoader;
 
-    public function __construct(UsersRepositoryInterface $usersRepository, EntityLoaderFactoryInterface $loaderFactory) {
+    public function __construct(UsersRepositoryInterface $usersRepository, DataLoaderFactoryInterface $loaderFactory) {
         parent::__construct(
-            $loaderFactory->create($usersRepository)
+            $loaderFactory->create(function($idList) use($usersRepository) {
+                return $usersRepository->findByIdList($idList);
+            })
         );
 
-        $this->usersRepository = $usersRepository;
+        $this->friendListLoader = $loaderFactory->create(function($idList) use($usersRepository) {
+            return $usersRepository->findFriendIds($idList);
+        });
     }
 
     /**
@@ -38,7 +41,7 @@ class UserResolver extends EntityResolver
     public function resolveField($user, $fieldName)
     {
         if ($fieldName === "friends") {
-            return $this->usersRepository->findFriendIds($user->id);
+            return $this->friendListLoader->load($user->id);
         }
 
         return parent::resolveField($user, $fieldName);

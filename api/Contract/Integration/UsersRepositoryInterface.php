@@ -10,12 +10,21 @@ namespace Everywhere\Api\Contract\Integration;
 
 use Everywhere\Api\Contract\Schema\EntitySourceInterface;
 
-interface UsersRepositoryInterface extends EntitySourceInterface
+interface UsersRepositoryInterface
 {
     /**
+     * @param array $idList
      * @return array<User>
+     */
+    public function findByIdList($idList);
+
+    /**
+     * @return array
      */
     public function findAllIds();
 
-    public function findFriendIds($userId);
+    /**
+     * @return array
+     */
+    public function findFriendIds($idList);
 }

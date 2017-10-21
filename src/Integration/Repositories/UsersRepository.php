@@ -16,7 +16,7 @@ class UsersRepository implements UsersRepositoryInterface
 {
     public $counter = 0;
 
-    public function findByIdList(array $idList)
+    public function findByIdList($idList)
     {
         $this->counter++;
 
@@ -42,12 +42,20 @@ class UsersRepository implements UsersRepositoryInterface
 
     public function findAllIds()
     {
+        $this->counter++;
+
         return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 100);
     }
 
-    public function findFriendIds($userId)
+    public function findFriendIds($userIds)
     {
-        return \FRIENDS_BOL_Service::getInstance()->findFriendIdList($userId, 0, 100);
+        $this->counter++;
+        $out = [];
+        foreach ($userIds as $userId) {
+            $out[$userId] =  \FRIENDS_BOL_Service::getInstance()->findFriendIdList($userId, 0, 100);
+        }
+
+        return $out;
     }
 
     public function __destruct()
