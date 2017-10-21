@@ -3,6 +3,7 @@ schema {
 }
 
 type Query {
+    me: User
     users: [User]
 }
 

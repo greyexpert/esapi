@@ -13,6 +13,11 @@ use Everywhere\Api\Contract\Schema\EntitySourceInterface;
 interface UsersRepositoryInterface
 {
     /**
+     * @return int
+     */
+    public function getCurrentUserId();
+
+    /**
      * @param array $idList
      * @return array<User>
      */

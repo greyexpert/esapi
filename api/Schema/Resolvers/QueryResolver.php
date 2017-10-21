@@ -32,6 +32,10 @@ class QueryResolver implements ResolverInterface
             case "users":
                 $out = $this->usersRepository->findAllIds();
                 break;
+
+            case "me":
+                $out = $this->usersRepository->getCurrentUserId();
+                break;
         }
 
         return $out;

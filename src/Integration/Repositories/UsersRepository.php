@@ -16,6 +16,11 @@ class UsersRepository implements UsersRepositoryInterface
 {
     public $counter = 0;
 
+    public function getCurrentUserId()
+    {
+        return 17;
+    }
+
     public function findByIdList($idList)
     {
         $this->counter++;
