@@ -7,6 +7,7 @@ use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\EntityLoaderFactory;
+use Everywhere\Api\Schema\Resolvers\PhotoResolver;
 use Everywhere\Api\Schema\Resolvers\QueryResolver;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
@@ -67,6 +68,13 @@ return [
     UserResolver::class => function(ContainerInterface $container) {
         return new UserResolver(
             $container->getIntegration()->getUsersRepository(),
+            $container[DataLoaderFactoryInterface::class]
+        );
+    },
+
+    PhotoResolver::class => function(ContainerInterface $container) {
+        return new PhotoResolver(
+            $container->getIntegration()->getPhotoRepository(),
             $container[DataLoaderFactoryInterface::class]
         );
     }

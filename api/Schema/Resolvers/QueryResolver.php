@@ -29,12 +29,12 @@ class QueryResolver implements ResolverInterface
         $out = null;
 
         switch ($info->fieldName) {
-            case "users":
-                $out = $this->usersRepository->findAllIds();
-                break;
-
             case "me":
                 $out = $this->usersRepository->getCurrentUserId();
+                break;
+
+            case "users":
+                $out = $this->usersRepository->findAllIds();
                 break;
         }
 

@@ -21,15 +21,24 @@ class UserResolver extends EntityResolver
      */
     protected $friendListLoader;
 
+    /**
+     * @var DataLoader
+     */
+    protected $photosLoader;
+
     public function __construct(UsersRepositoryInterface $usersRepository, DataLoaderFactoryInterface $loaderFactory) {
         parent::__construct(
-            $loaderFactory->create(function($idList) use($usersRepository) {
-                return $usersRepository->findByIdList($idList);
+            $loaderFactory->create(function($ids) use($usersRepository) {
+                return $usersRepository->findByIds($ids);
             })
         );
 
-        $this->friendListLoader = $loaderFactory->create(function($idList) use($usersRepository) {
-            return $usersRepository->findFriendIds($idList);
+        $this->friendListLoader = $loaderFactory->create(function($ids) use($usersRepository) {
+            return $usersRepository->findFriends($ids);
+        });
+
+        $this->photosLoader = $loaderFactory->create(function($ids) use($usersRepository) {
+            return $usersRepository->findPhotos($ids);
         });
     }
 
@@ -42,6 +51,10 @@ class UserResolver extends EntityResolver
     {
         if ($fieldName === "friends") {
             return $this->friendListLoader->load($user->id);
+        }
+
+        if ($fieldName === "photos") {
+            return $this->photosLoader->load($user->id);
         }
 
         return parent::resolveField($user, $fieldName);

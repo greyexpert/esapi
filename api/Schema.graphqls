@@ -13,4 +13,11 @@ type User {
     email: String!
 
     friends: [User]
+    photos: [Photo]
+}
+
+type Photo {
+    id: ID!
+    src: String!
+    owner: User!
 }

@@ -15,4 +15,9 @@ interface IntegrationInterface
      * @return UsersRepositoryInterface
      */
     public function getUsersRepository();
+
+    /**
+     * @return PhotoRepositoryInterface
+     */
+    public function getPhotoRepository();
 }
