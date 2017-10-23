@@ -39,7 +39,7 @@ class UserResolver extends EntityResolver
         });
 
         $this->commentsLoader = $loaderFactory->create(function($ids) use($usersRepository) {
-            return $usersRepository->findCommentIds($ids);
+            return $usersRepository->findComments($ids);
         });
     }
 

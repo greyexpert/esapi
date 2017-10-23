@@ -63,16 +63,11 @@ class UsersRepository implements UsersRepositoryInterface
         return $out;
     }
 
-    public function findCommentIds($userIds)
+    public function findComments($ids)
     {
-//        $this->counter++;
-//        $out = [];
-//        foreach ($userIds as $userId) {
-//            $out[$userId] =  \FRIENDS_BOL_Service::getInstance()->findFriendIdList($userId, 0, 100);
-//        }
-//
-//        return $out;
-        return [];
+        $out = [];
+
+        return $out;
     }
 
     public function __destruct()

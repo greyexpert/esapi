@@ -10,9 +10,4 @@ interface CommentsRepositoryInterface
      * @return array<Comment>
      */
     public function findByIds($ids);
-
-    /**
-     * @return array
-     */
-    public function findAllIds();
 }

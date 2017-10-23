@@ -15,4 +15,9 @@ interface IntegrationInterface
      * @return UsersRepositoryInterface
      */
     public function getUsersRepository();
+
+    /**
+     * @return CommentsRepositoryInterface
+     */
+    public function getCommentsRepository();
 }

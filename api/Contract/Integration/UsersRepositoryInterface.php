@@ -33,8 +33,9 @@ interface UsersRepositoryInterface
      */
     public function findFriendIds($idList);
 
+
     /**
      * @return array
      */
-    public function findCommentIds($ids);
+    public function findComments($ids);
 }

@@ -76,5 +76,5 @@ return [
             $container->getIntegration()->getCommentsRepository(),
             $container[DataLoaderFactoryInterface::class]
         );
-    }
+    },
 ];
