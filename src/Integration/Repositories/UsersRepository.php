@@ -21,7 +21,7 @@ class UsersRepository implements UsersRepositoryInterface
         return 17;
     }
 
-    public function findByIdList($idList)
+    public function findByIds($idList)
     {
         $this->counter++;
 
@@ -52,7 +52,7 @@ class UsersRepository implements UsersRepositoryInterface
         return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 100);
     }
 
-    public function findFriendIds($userIds)
+    public function findFriends($userIds)
     {
         $this->counter++;
         $out = [];
@@ -66,6 +66,23 @@ class UsersRepository implements UsersRepositoryInterface
     public function findComments($ids)
     {
         $out = [];
+
+        return $out;
+    }
+
+    public function findPhotos($ids)
+    {
+        $items = \PHOTO_BOL_PhotoService::getInstance()->findPhotoListByUserIdList($ids, 1, 100);
+        $out = [];
+
+        foreach ($items as $item) {
+            $userId = (int) $item["userId"];
+            $userItems = empty($out[$userId]) ? [] : $out[$userId];
+
+            $userItems[] = $item["id"];
+
+            $out[$userId] = $userItems;
+        }
 
         return $out;
     }

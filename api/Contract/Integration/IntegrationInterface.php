@@ -20,4 +20,9 @@ interface IntegrationInterface
      * @return CommentsRepositoryInterface
      */
     public function getCommentsRepository();
+
+    /**
+     * @return PhotoRepositoryInterface
+     */
+    public function getPhotoRepository();
 }

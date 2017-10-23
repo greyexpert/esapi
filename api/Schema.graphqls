@@ -14,9 +14,16 @@ type User {
 
     friends: [User]
     comments: [Comment]
+    photos: [Photo]
 }
 
 type Comment {
     id: ID!
     text: String!
+}
+
+type Photo {
+    id: ID!
+    src: String!
+    owner: User!
 }

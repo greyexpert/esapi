@@ -18,10 +18,10 @@ interface UsersRepositoryInterface
     public function getCurrentUserId();
 
     /**
-     * @param array $idList
+     * @param array $ids
      * @return array<User>
      */
-    public function findByIdList($idList);
+    public function findByIds($ids);
 
     /**
      * @return array
@@ -29,13 +29,20 @@ interface UsersRepositoryInterface
     public function findAllIds();
 
     /**
-     * @return array
+     * @param $ids
+     * @return mixed
      */
-    public function findFriendIds($idList);
-
+    public function findFriends($ids);
 
     /**
-     * @return array
+     * @param $ids
+     * @return mixed
      */
     public function findComments($ids);
+
+    /**
+     * @param $ids
+     * @return mixed
+     */
+    public function findPhotos($ids);
 }
