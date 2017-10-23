@@ -1,8 +1,7 @@
-# esapi
-GraphQL API for Oxwall Messenger
+# GraphQL API for Oxwall Messenger
 
 ## Install
-- `git clone --recursive https://github.com/greyexpert/esapi`
+- `git clone --recursive https://gitlab.com/thisissparkle/oxwall-integration`
 - `composer install`
 
 ## Run

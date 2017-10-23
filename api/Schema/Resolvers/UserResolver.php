@@ -9,6 +9,7 @@
 namespace Everywhere\Api\Schema\Resolvers;
 
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
+use Everywhere\Api\Contract\Integration\CommentsRepositoryInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Entities\User;
 use Everywhere\Api\Schema\DataLoader;
@@ -21,6 +22,11 @@ class UserResolver extends EntityResolver
      */
     protected $friendListLoader;
 
+    /**
+     * @var DataLoader
+     */
+    protected $commentsLoader;
+
     public function __construct(UsersRepositoryInterface $usersRepository, DataLoaderFactoryInterface $loaderFactory) {
         parent::__construct(
             $loaderFactory->create(function($idList) use($usersRepository) {
@@ -31,6 +37,10 @@ class UserResolver extends EntityResolver
         $this->friendListLoader = $loaderFactory->create(function($idList) use($usersRepository) {
             return $usersRepository->findFriendIds($idList);
         });
+
+        $this->commentsLoader = $loaderFactory->create(function($ids) use($usersRepository) {
+            return $usersRepository->findCommentIds($ids);
+        });
     }
 
     /**
@@ -40,10 +50,18 @@ class UserResolver extends EntityResolver
      */
     public function resolveField($user, $fieldName)
     {
-        if ($fieldName === "friends") {
-            return $this->friendListLoader->load($user->id);
-        }
+      switch ($fieldName) {
+        case "friends":
+          return $this->friendListLoader->load($user->id);
+          break;
+        case "comments":
+          return $this->commentsLoader->load($user->id);
+          break;
 
-        return parent::resolveField($user, $fieldName);
+        default:
+          return parent::resolveField($user, $fieldName);
+          break;
+      }
+
     }
 }

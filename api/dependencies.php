@@ -69,5 +69,12 @@ return [
             $container->getIntegration()->getUsersRepository(),
             $container[DataLoaderFactoryInterface::class]
         );
+    },
+
+    CommentResolver::class => function(ContainerInterface $container) {
+        return new CommentResolver(
+            $container->getIntegration()->getCommentsRepository(),
+            $container[DataLoaderFactoryInterface::class]
+        );
     }
 ];

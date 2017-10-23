@@ -32,4 +32,9 @@ interface UsersRepositoryInterface
      * @return array
      */
     public function findFriendIds($idList);
+
+    /**
+     * @return array
+     */
+    public function findCommentIds($ids);
 }

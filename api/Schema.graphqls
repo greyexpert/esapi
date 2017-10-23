@@ -13,4 +13,10 @@ type User {
     email: String!
 
     friends: [User]
+    comments: [Comment]
+}
+
+type Comment {
+    id: ID!
+    text: String!
 }
