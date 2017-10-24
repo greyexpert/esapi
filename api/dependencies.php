@@ -26,6 +26,7 @@ return [
 
     ServerConfig::class => function(ContainerInterface $container) {
         return ServerConfig::create([
+            "debug" => true,
             "schema" => $container[BuilderInterface::class]->build(),
             "promiseAdapter" => $container[PromiseAdapter::class]
         ]);
