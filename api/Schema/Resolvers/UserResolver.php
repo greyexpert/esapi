@@ -12,7 +12,6 @@ use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderInterface;
 use Everywhere\Api\Entities\User;
-use Everywhere\Api\Schema\DataLoader;
 use Everywhere\Api\Schema\EntityResolver;
 
 class UserResolver extends EntityResolver
@@ -26,11 +25,6 @@ class UserResolver extends EntityResolver
      * @var DataLoaderInterface
      */
     protected $photosLoader;
-    
-    /**
-     * @var DataLoaderInterface
-     */
-    protected $commentsLoader;
 
     public function __construct(UsersRepositoryInterface $usersRepository, DataLoaderFactoryInterface $loaderFactory) {
         parent::__construct(
@@ -41,10 +35,6 @@ class UserResolver extends EntityResolver
 
         $this->friendListLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
             return $usersRepository->findFriends($ids, $args);
-        }, []);
-
-        $this->commentsLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
-            return $usersRepository->findComments($ids, $args);
         }, []);
 
         $this->photosLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
@@ -61,21 +51,21 @@ class UserResolver extends EntityResolver
     public function resolveField($user, $fieldName, $args)
     {
         switch ($fieldName) {
-	        case "friends":
-	          return $this->friendListLoader->load($user->id, $args);
-	          break;
-	
-	        case "comments":
-	          return $this->commentsLoader->load($user->id, $args);
-	          break;
-	
-			case "photos":
-	          return $this->photosLoader->load($user->id, $args);
-	          break;
-	
-	        default:
-	          return parent::resolveField($user, $fieldName, $args);
-	          break;
-	    }
+            case "friends":
+                return $this->friendListLoader->load($user->id, $args);
+                break;
+
+            case "comments":
+                return $this->commentsLoader->load($user->id, $args);
+                break;
+
+            case "photos":
+                return $this->photosLoader->load($user->id, $args);
+                break;
+
+            default:
+                return parent::resolveField($user, $fieldName, $args);
+                break;
+        }
     }
 }

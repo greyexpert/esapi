@@ -8,7 +8,6 @@
 
 namespace Everywhere\Api\Contract\Integration;
 
-
 interface IntegrationInterface
 {
     /**
@@ -17,12 +16,12 @@ interface IntegrationInterface
     public function getUsersRepository();
 
     /**
-     * @return CommentsRepositoryInterface
-     */
-    public function getCommentsRepository();
-
-    /**
      * @return PhotoRepositoryInterface
      */
     public function getPhotoRepository();
+
+    /**
+     * @return CommentsRepositoryInterface
+     */
+    public function getCommentsRepository();
 }

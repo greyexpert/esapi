@@ -10,8 +10,8 @@ namespace Everywhere\Oxwall\Integration;
 
 use Everywhere\Api\Contract\Integration\IntegrationInterface;
 use Everywhere\Oxwall\Integration\Repositories\UsersRepository;
-use Everywhere\Oxwall\Integration\Repositories\CommentsRepository;
 use Everywhere\Oxwall\Integration\Repositories\PhotoRepository;
+use Everywhere\Oxwall\Integration\Repositories\CommentRepository;
 
 class Integration implements IntegrationInterface
 {
@@ -20,13 +20,13 @@ class Integration implements IntegrationInterface
         return new UsersRepository();
     }
 
-    public function getCommentsRepository()
-    {
-        return new CommentsRepository();
-    }
-
     public function getPhotoRepository()
     {
         return new PhotoRepository();
+    }
+
+    public function getCommentsRepository()
+    {
+        return new CommentRepository();
     }
 }

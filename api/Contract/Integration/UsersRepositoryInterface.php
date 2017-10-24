@@ -8,8 +8,6 @@
 
 namespace Everywhere\Api\Contract\Integration;
 
-use Everywhere\Api\Contract\Schema\EntitySourceInterface;
-
 interface UsersRepositoryInterface
 {
     /**
@@ -37,13 +35,8 @@ interface UsersRepositoryInterface
 
     /**
      * @param $ids
-     * @return mixed
-     */
-    public function findComments($ids, array $args);
-
-    /**
-     * @param $ids
      * @param $args
      * @return mixed
      */
     public function findPhotos($ids, array $args);
+}

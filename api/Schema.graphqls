@@ -13,17 +13,19 @@ type User {
     email: String!
 
     friends(offset: Int = 0, count: Int = 10): [User]
-    comments: [Comment]
     photos(offset: Int = 0, count: Int = 10): [Photo]
-}
-
-type Comment {
-    id: ID!
-    text: String!
 }
 
 type Photo {
     id: ID!
     src: String!
     owner: User!
+
+    comments(offset: Int = 0, count: Int = 10): [Comment]
+}
+
+
+type Comment {
+    id: ID!
+    text: String!
 }

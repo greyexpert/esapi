@@ -16,4 +16,10 @@ interface PhotoRepositoryInterface
      * @return mixed
      */
     public function findByIds($ids);
+
+    /**
+     * @param $ids
+     * @return mixed
+     */
+    public function findComments($ids, array $args);
 }

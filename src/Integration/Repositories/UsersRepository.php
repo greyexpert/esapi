@@ -8,7 +8,6 @@
 
 namespace Everywhere\Oxwall\Integration\Repositories;
 
-
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
 use Everywhere\Api\Entities\User;
 
@@ -49,7 +48,7 @@ class UsersRepository implements UsersRepositoryInterface
     {
         $this->counter++;
 
-        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 3);
+        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 100);
     }
 
     public function findFriends($userIds, array $args)
@@ -63,17 +62,9 @@ class UsersRepository implements UsersRepositoryInterface
         return $out;
     }
 
-    public function findComments($ids, array $args)
+    public function findPhotos($userIds, array $args)
     {
-        $out = [];
-
-        return $out;
-    }
-
-
-    public function findPhotos($ids, array $args)
-    {
-        $items = \PHOTO_BOL_PhotoService::getInstance()->findPhotoListByUserIdList($ids, 1, $args["count"]);
+        $items = \PHOTO_BOL_PhotoService::getInstance()->findPhotoListByUserIdList($userIds, 1, $args["count"]);
         $out = [];
 
         foreach ($items as $item) {

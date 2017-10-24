@@ -1,8 +1,6 @@
 <?php
 namespace Everywhere\Api\Contract\Integration;
 
-use Everywhere\Api\Contract\Schema\EntitySourceInterface;
-
 interface CommentsRepositoryInterface
 {
     /**
