@@ -33,30 +33,31 @@ class UserResolver extends EntityResolver
             })
         );
 
-        $this->friendListLoader = $loaderFactory->create(function($ids) use($usersRepository) {
-            return $usersRepository->findFriends($ids);
+        $this->friendListLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+            return $usersRepository->findFriends($ids, $args);
         });
 
-        $this->photosLoader = $loaderFactory->create(function($ids) use($usersRepository) {
-            return $usersRepository->findPhotos($ids);
+        $this->photosLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+            return $usersRepository->findPhotos($ids, $args);
         });
     }
 
     /**
      * @param User $user
      * @param $fieldName
+     * @param $args
      * @return mixed|null
      */
-    public function resolveField($user, $fieldName)
+    public function resolveField($user, $fieldName, $args)
     {
         if ($fieldName === "friends") {
-            return $this->friendListLoader->load($user->id);
+            return $this->friendListLoader->load([$user->id, $args]);
         }
 
         if ($fieldName === "photos") {
-            return $this->photosLoader->load($user->id);
+            return $this->photosLoader->load([$user->id, $args]);
         }
 
-        return parent::resolveField($user, $fieldName);
+        return parent::resolveField($user, $fieldName, $args);
     }
 }

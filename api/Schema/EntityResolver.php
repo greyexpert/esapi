@@ -25,8 +25,8 @@ class EntityResolver implements ResolverInterface
     }
 
     public function resolve($root, $args, $context, ResolveInfo $info) {
-        return $this->entityLoader->load($root)->then(function($entity) use ($info) {
-            return $this->resolveField($entity, $info->fieldName);
+        return $this->entityLoader->load($root)->then(function($entity) use ($info, $args) {
+            return $this->resolveField($entity, $info->fieldName, $args);
         });
     }
 
@@ -35,7 +35,7 @@ class EntityResolver implements ResolverInterface
      * @param $fieldName
      * @return null|mixed
      */
-    protected function resolveField($entity, $fieldName) {
+    protected function resolveField($entity, $fieldName, $args) {
         return isset($entity->{$fieldName})
             ? $entity->{$fieldName}
             : null;

@@ -30,13 +30,15 @@ interface UsersRepositoryInterface
 
     /**
      * @param $ids
+     * @param $args
      * @return mixed
      */
-    public function findFriends($ids);
+    public function findFriends($ids, array $args);
 
     /**
      * @param $ids
+     * @param $args
      * @return mixed
      */
-    public function findPhotos($ids);
+    public function findPhotos($ids, array $args);
 }

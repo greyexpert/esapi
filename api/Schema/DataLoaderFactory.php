@@ -23,13 +23,53 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
 
     public function create(callable $source)
     {
-        return new DataLoader(function($ids) use ($source) {
-            return $this->retrieveEntities($source, $ids);
+        return new DataLoader(function($keys) use ($source) {
+            $out = array_fill(0, count($keys), null);
+            $buckets = $this->parseKeys($keys);
+
+            foreach ($buckets as $bucket) {
+                list($ids, $args, $bucketKeyIndexes) = $bucket;
+                $bucketData = $this->retrieveItems($source, $ids, $args);
+
+                foreach ($bucketKeyIndexes as $index => $keyIndex) {
+                    $out[$keyIndex] = $bucketData[$index];
+                }
+            }
+
+            return $this->promiseAdapter->createFulfilled(array_values($out));
         }, $this->promiseAdapter);
     }
 
-    protected function retrieveEntities(callable $source, $ids) {
-        $dataList = $source($ids);
+    protected function parseKey($key) {
+        $id = null;
+        $args = [];
+
+        if (is_array($key)) { // contains arguments
+            $id = empty($key[0]) ? null : $key[0];
+            $args = empty($key[1]) ? [] : $key[1];
+        } else { // simple key = id
+            $id = $key;
+        }
+
+        return [$id, $args];
+    }
+
+    protected function parseKeys(array $keys) {
+        $byArgs = [];
+        foreach ($keys as $index => $key) {
+            list($id, $args) = $this->parseKey($key);
+            $argsKey = json_encode($args);
+            $byArgs[$argsKey] = empty($byArgs[$argsKey]) ? [[], $args, []] : $byArgs[$argsKey];
+
+            $byArgs[$argsKey][0][] = $id;
+            $byArgs[$argsKey][2][] = $index;
+        }
+
+        return array_values($byArgs);
+    }
+
+    protected function retrieveItems(callable $source, $ids, $args = []) {
+        $dataList = $source($ids, $args);
         $byIdList = array_flip($ids);
 
         foreach ($dataList as $id => $data) {
@@ -38,6 +78,6 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
             }
         }
 
-        return $this->promiseAdapter->createFulfilled(array_values($byIdList));
+        return array_values($byIdList);
     }
 }

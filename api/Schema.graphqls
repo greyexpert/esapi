@@ -12,8 +12,8 @@ type User {
     name: String!
     email: String!
 
-    friends: [User]
-    photos: [Photo]
+    friends(offset: Int = 0, count: Int = 10): [User]
+    photos(offset: Int = 0, count: Int = 10): [Photo]
 }
 
 type Photo {
