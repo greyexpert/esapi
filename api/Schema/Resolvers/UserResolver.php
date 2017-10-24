@@ -10,6 +10,7 @@ namespace Everywhere\Api\Schema\Resolvers;
 
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
+use Everywhere\Api\Contract\Schema\DataLoaderInterface;
 use Everywhere\Api\Entities\User;
 use Everywhere\Api\Schema\DataLoader;
 use Everywhere\Api\Schema\EntityResolver;
@@ -17,12 +18,12 @@ use Everywhere\Api\Schema\EntityResolver;
 class UserResolver extends EntityResolver
 {
     /**
-     * @var DataLoader
+     * @var DataLoaderInterface
      */
     protected $friendListLoader;
 
     /**
-     * @var DataLoader
+     * @var DataLoaderInterface
      */
     protected $photosLoader;
 
@@ -51,11 +52,11 @@ class UserResolver extends EntityResolver
     public function resolveField($user, $fieldName, $args)
     {
         if ($fieldName === "friends") {
-            return $this->friendListLoader->load([$user->id, $args]);
+            return $this->friendListLoader->load($user->id, $args);
         }
 
         if ($fieldName === "photos") {
-            return $this->photosLoader->load([$user->id, $args]);
+            return $this->photosLoader->load($user->id, $args);
         }
 
         return parent::resolveField($user, $fieldName, $args);

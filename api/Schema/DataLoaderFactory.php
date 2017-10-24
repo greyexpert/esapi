@@ -10,6 +10,7 @@ namespace Everywhere\Api\Schema;
 
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use GraphQL\Executor\Promise\PromiseAdapter;
+use Overblog\DataLoader\DataLoader;
 use Overblog\PromiseAdapter\Adapter\WebonyxGraphQLSyncPromiseAdapter;
 
 class DataLoaderFactory implements DataLoaderFactoryInterface
@@ -23,9 +24,17 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
 
     public function create(callable $source)
     {
-        return new DataLoader(function($keys) use ($source) {
+        $loader = new DataLoader($this->createBatchLoadFn($source), $this->promiseAdapter);
+
+        return new DataLoaderDecorator($loader, function($key, $args = []) {
+            return $this->buildKey($key, $args);
+        });
+    }
+
+    protected function createBatchLoadFn(callable $source) {
+        return function($keys) use ($source) {
             $out = array_fill(0, count($keys), null);
-            $buckets = $this->parseKeys($keys);
+            $buckets = $this->createBuckets($keys);
 
             foreach ($buckets as $bucket) {
                 list($ids, $args, $bucketKeyIndexes) = $bucket;
@@ -37,7 +46,11 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
             }
 
             return $this->promiseAdapter->createFulfilled(array_values($out));
-        }, $this->promiseAdapter);
+        };
+    }
+
+    protected function buildKey($key, array $args = []) {
+        return [$key, $args];
     }
 
     protected function parseKey($key) {
@@ -54,7 +67,7 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
         return [$id, $args];
     }
 
-    protected function parseKeys(array $keys) {
+    protected function createBuckets(array $keys) {
         $byArgs = [];
         foreach ($keys as $index => $key) {
             list($id, $args) = $this->parseKey($key);

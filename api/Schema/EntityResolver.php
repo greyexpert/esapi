@@ -10,17 +10,18 @@ namespace Everywhere\Api\Schema;
 
 use Everywhere\Api\Contract\Entities\EntityInterface;
 use Everywhere\Api\Contract\Integration\EntitySourceInterface;
+use Everywhere\Api\Contract\Schema\DataLoaderInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class EntityResolver implements ResolverInterface
 {
     /**
-     * @var DataLoader
+     * @var DataLoaderInterface
      */
     protected $entityLoader;
 
-    public function __construct(DataLoader $entityLoader) {
+    public function __construct(DataLoaderInterface $entityLoader) {
         $this->entityLoader = $entityLoader;
     }
 
@@ -33,6 +34,7 @@ class EntityResolver implements ResolverInterface
     /**
      * @param EntityInterface $entity
      * @param $fieldName
+     * @param $args
      * @return null|mixed
      */
     protected function resolveField($entity, $fieldName, $args) {

@@ -49,7 +49,7 @@ class UsersRepository implements UsersRepositoryInterface
     {
         $this->counter++;
 
-        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 100);
+        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 3);
     }
 
     public function findFriends($userIds, array $args)

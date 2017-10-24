@@ -11,5 +11,9 @@ namespace Everywhere\Api\Contract\Schema;
 
 interface DataLoaderFactoryInterface
 {
+    /**
+     * @param callable $source
+     * @return DataLoaderInterface
+     */
     public function create(callable $source);
 }
