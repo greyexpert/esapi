@@ -12,9 +12,9 @@ type User {
     name: String!
     email: String!
 
-    friends: [User]
+    friends(offset: Int = 0, count: Int = 10): [User]
     comments: [Comment]
-    photos: [Photo]
+    photos(offset: Int = 0, count: Int = 10): [Photo]
 }
 
 type Comment {

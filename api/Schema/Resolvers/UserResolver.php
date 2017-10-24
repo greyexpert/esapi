@@ -10,6 +10,7 @@ namespace Everywhere\Api\Schema\Resolvers;
 
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
+use Everywhere\Api\Contract\Schema\DataLoaderInterface;
 use Everywhere\Api\Entities\User;
 use Everywhere\Api\Schema\DataLoader;
 use Everywhere\Api\Schema\EntityResolver;
@@ -17,17 +18,17 @@ use Everywhere\Api\Schema\EntityResolver;
 class UserResolver extends EntityResolver
 {
     /**
-     * @var DataLoader
+     * @var DataLoaderInterface
      */
     protected $friendListLoader;
 
     /**
-     * @var DataLoader
+     * @var DataLoaderInterface
      */
     protected $photosLoader;
     
     /**
-     * @var DataLoader
+     * @var DataLoaderInterface
      */
     protected $commentsLoader;
 
@@ -38,43 +39,43 @@ class UserResolver extends EntityResolver
             })
         );
 
-        $this->friendListLoader = $loaderFactory->create(function($ids) use($usersRepository) {
-            return $usersRepository->findFriends($ids);
-        });
+        $this->friendListLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+            return $usersRepository->findFriends($ids, $args);
+        }, []);
 
-        $this->commentsLoader = $loaderFactory->create(function($ids) use($usersRepository) {
-            return $usersRepository->findComments($ids);
-        });
+        $this->commentsLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+            return $usersRepository->findComments($ids, $args);
+        }, []);
 
-        $this->photosLoader = $loaderFactory->create(function($ids) use($usersRepository) {
-            return $usersRepository->findPhotos($ids);
-        });
+        $this->photosLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+            return $usersRepository->findPhotos($ids, $args);
+        }, []);
     }
 
     /**
      * @param User $user
      * @param $fieldName
+     * @param $args
      * @return mixed|null
      */
-    public function resolveField($user, $fieldName)
+    public function resolveField($user, $fieldName, $args)
     {
-      switch ($fieldName) {
-        case "friends":
-          return $this->friendListLoader->load($user->id);
-          break;
-
-        case "comments":
-          return $this->commentsLoader->load($user->id);
-          break;
-
-		case "photos":
-          return $this->photosLoader->load($user->id);
-          break;
-
-        default:
-          return parent::resolveField($user, $fieldName);
-          break;
-      }
-
+        switch ($fieldName) {
+	        case "friends":
+	          return $this->friendListLoader->load($user->id, $args);
+	          break;
+	
+	        case "comments":
+	          return $this->commentsLoader->load($user->id, $args);
+	          break;
+	
+			case "photos":
+	          return $this->photosLoader->load($user->id, $args);
+	          break;
+	
+	        default:
+	          return parent::resolveField($user, $fieldName, $args);
+	          break;
+	    }
     }
 }

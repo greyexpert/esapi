@@ -16,6 +16,8 @@ class PhotoRepository implements PhotoRepositoryInterface
 {
     public function findByIds($ids)
     {
+
+
         $items = \PHOTO_BOL_PhotoService::getInstance()->findPhotoListByIdList($ids, 1, count($ids));
 
         $out = [];

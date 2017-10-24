@@ -49,30 +49,31 @@ class UsersRepository implements UsersRepositoryInterface
     {
         $this->counter++;
 
-        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 100);
+        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 3);
     }
 
-    public function findFriends($userIds)
+    public function findFriends($userIds, array $args)
     {
         $this->counter++;
         $out = [];
         foreach ($userIds as $userId) {
-            $out[$userId] =  \FRIENDS_BOL_Service::getInstance()->findFriendIdList($userId, 0, 100);
+            $out[$userId] =  \FRIENDS_BOL_Service::getInstance()->findFriendIdList($userId, $args["offset"], $args["count"]);
         }
 
         return $out;
     }
 
-    public function findComments($ids)
+    public function findComments($ids, array $args)
     {
         $out = [];
 
         return $out;
     }
 
-    public function findPhotos($ids)
+
+    public function findPhotos($ids, array $args)
     {
-        $items = \PHOTO_BOL_PhotoService::getInstance()->findPhotoListByUserIdList($ids, 1, 100);
+        $items = \PHOTO_BOL_PhotoService::getInstance()->findPhotoListByUserIdList($ids, 1, $args["count"]);
         $out = [];
 
         foreach ($items as $item) {
