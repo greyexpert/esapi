@@ -13,7 +13,9 @@ interface DataLoaderFactoryInterface
 {
     /**
      * @param callable $source
+     * @param null $emptyValue
+     *
      * @return DataLoaderInterface
      */
-    public function create(callable $source);
+    public function create(callable $source, $emptyValue = null);
 }

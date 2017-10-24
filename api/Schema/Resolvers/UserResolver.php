@@ -36,11 +36,11 @@ class UserResolver extends EntityResolver
 
         $this->friendListLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
             return $usersRepository->findFriends($ids, $args);
-        });
+        }, []);
 
         $this->photosLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
             return $usersRepository->findPhotos($ids, $args);
-        });
+        }, []);
     }
 
     /**

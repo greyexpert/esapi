@@ -15,6 +15,9 @@ use Overblog\PromiseAdapter\Adapter\WebonyxGraphQLSyncPromiseAdapter;
 
 class DataLoaderFactory implements DataLoaderFactoryInterface
 {
+    /**
+     * @var WebonyxGraphQLSyncPromiseAdapter
+     */
     protected $promiseAdapter;
 
     public function __construct(PromiseAdapter $promiseAdapter)
@@ -22,23 +25,23 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
         $this->promiseAdapter = new WebonyxGraphQLSyncPromiseAdapter($promiseAdapter);
     }
 
-    public function create(callable $source)
+    public function create(callable $source, $emptyValue = null)
     {
-        $loader = new DataLoader($this->createBatchLoadFn($source), $this->promiseAdapter);
+        $loader = new DataLoader($this->createBatchLoadFn($source, $emptyValue), $this->promiseAdapter);
 
         return new DataLoaderDecorator($loader, function($key, $args = []) {
             return $this->buildKey($key, $args);
         });
     }
 
-    protected function createBatchLoadFn(callable $source) {
-        return function($keys) use ($source) {
-            $out = array_fill(0, count($keys), null);
+    protected function createBatchLoadFn(callable $source, $defaultValue = null) {
+        return function($keys) use ($source, $defaultValue) {
+            $out = array_fill(0, count($keys), $defaultValue);
             $buckets = $this->createBuckets($keys);
 
             foreach ($buckets as $bucket) {
                 list($ids, $args, $bucketKeyIndexes) = $bucket;
-                $bucketData = $this->retrieveItems($source, $ids, $args);
+                $bucketData = $this->retrieveItems($source, $ids, $args, $defaultValue);
 
                 foreach ($bucketKeyIndexes as $index => $keyIndex) {
                     $out[$keyIndex] = $bucketData[$index];
@@ -81,16 +84,16 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
         return array_values($byArgs);
     }
 
-    protected function retrieveItems(callable $source, $ids, $args = []) {
+    protected function retrieveItems(callable $source, $ids, $args = [], $defaultValue = null) {
         $dataList = $source($ids, $args);
-        $byIdList = array_flip($ids);
+        $out = array_fill(0, count($ids), $defaultValue);
 
-        foreach ($dataList as $id => $data) {
-            if (array_key_exists($id, $byIdList)) {
-                $byIdList[$id] = $data;
+        foreach ($ids as $index => $id) {
+            if (array_key_exists($id, $dataList)) {
+                $out[$index] = $dataList[$id];
             }
         }
 
-        return array_values($byIdList);
+        return $out;
     }
 }
