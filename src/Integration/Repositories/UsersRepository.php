@@ -44,11 +44,11 @@ class UsersRepository implements UsersRepositoryInterface
         return $users;
     }
 
-    public function findAllIds()
+    public function findAllIds(array $args)
     {
         $this->counter++;
 
-        return \BOL_UserService::getInstance()->findLatestUserIdsList(0, 100);
+        return \BOL_UserService::getInstance()->findLatestUserIdsList($args["offset"], $args["count"]);
     }
 
     public function findFriends($userIds, array $args)

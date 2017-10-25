@@ -12,7 +12,9 @@ use Everywhere\Api\Contract\Entities\EntityInterface;
 use Everywhere\Api\Contract\Integration\EntitySourceInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
+use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Utils\Utils;
 
 class EntityResolver implements ResolverInterface
 {
@@ -25,12 +27,22 @@ class EntityResolver implements ResolverInterface
         $this->entityLoader = $entityLoader;
     }
 
+    protected function isEntity($value) {
+        return $value instanceof EntityInterface;
+    }
+
     public function resolve($root, $args, $context, ResolveInfo $info) {
-        if ($root instanceof EntityInterface) {
+        if ($this->isEntity($root)) {
             $this->entityLoader->prime($root->getId(), $root);
         }
 
         return $this->entityLoader->load($root)->then(function($entity) use ($info, $args) {
+            if (!$this->isEntity($entity)) {
+                throw new InvariantViolation(
+                    'Expected an entity object but received: ' . Utils::printSafe($entity)
+                );
+            }
+
             return $this->resolveField($entity, $info->fieldName, $args);
         });
     }

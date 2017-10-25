@@ -4,7 +4,7 @@ schema {
 
 type Query {
     me: User
-    users: [User]
+    users(offset: Int = 0, count: Int = 10): [User]
 }
 
 type User {

@@ -34,7 +34,7 @@ class QueryResolver implements ResolverInterface
                 break;
 
             case "users":
-                $out = $this->usersRepository->findAllIds();
+                $out = $this->usersRepository->findAllIds($args);
                 break;
         }
 

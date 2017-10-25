@@ -22,9 +22,10 @@ interface UsersRepositoryInterface
     public function findByIds($ids);
 
     /**
+     * @param array $args
      * @return array
      */
-    public function findAllIds();
+    public function findAllIds(array $args);
 
     /**
      * @param $ids
