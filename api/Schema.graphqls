@@ -24,7 +24,6 @@ type Photo {
     comments(offset: Int = 0, count: Int = 10): [Comment]
 }
 
-
 type Comment {
     id: ID!
     text: String!

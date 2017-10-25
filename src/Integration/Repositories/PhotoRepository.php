@@ -32,20 +32,22 @@ class PhotoRepository implements PhotoRepositoryInterface
 
     public function findComments($photoIds, array $args)
     {
-        $out = [];
-//        $entities = array_reduce($photoIds, function($result, $photoId) {
-//            $result[] = [
-//                "entityId" => (int) $photoId,
-//                "entityType" => "photo_comments",
-//                "countOnPage" => $args["count"],
-//            ];
-//
-//            return $result;
-//        }, []);
-//        $items = \BOL_CommentDao::getInstance()->findBatchCommentsList($entities);
+        $entities = array_map(function($photoId) use ($args) {
+            return [
+                "entityId" => (int)$photoId,
+                "entityType" => "photo_comments",
+                "countOnPage" => $args["count"],
+            ];
+        }, $photoIds);
+        $items = \BOL_CommentDao::getInstance()->findBatchCommentsList($entities);
 
-        foreach ($photoIds as $photoId) {
-            $items = \BOL_CommentService::getInstance()->findCommentList("photo_comments", 13, 1, $args["count"]);
+        $out = [];
+        foreach ($items as $item) {
+            $userId = (int) $item->userId;
+            $userItems = empty($out[$userId]) ? [] : $out[$userId];
+            $userItems[] = $item->id;
+
+            $out[$userId] = $userItems;
         }
 
         return $out;
