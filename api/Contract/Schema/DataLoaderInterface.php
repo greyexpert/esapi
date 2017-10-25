@@ -40,4 +40,13 @@ interface DataLoaderInterface
      * @return DataLoaderInterface
      */
     public function clearAll();
+
+    /**
+     * @param $key
+     * @param $value
+     * @param array $args
+     *
+     * @return DataLoaderInterface
+     */
+    public function prime($key, $value, array $args = []);
 }

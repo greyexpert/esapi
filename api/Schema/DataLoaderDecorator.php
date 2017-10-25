@@ -62,4 +62,13 @@ class DataLoaderDecorator implements DataLoaderInterface
 
         return $this;
     }
+
+    public function prime($key, $value, array $args = []) {
+        $this->loader->prime(
+            $this->buildKey($key, $args),
+            $value
+        );
+
+        return $this;
+    }
 }

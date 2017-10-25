@@ -26,6 +26,10 @@ class EntityResolver implements ResolverInterface
     }
 
     public function resolve($root, $args, $context, ResolveInfo $info) {
+        if ($root instanceof EntityInterface) {
+            $this->entityLoader->prime($root->getId(), $root);
+        }
+
         return $this->entityLoader->load($root)->then(function($entity) use ($info, $args) {
             return $this->resolveField($entity, $info->fieldName, $args);
         });
