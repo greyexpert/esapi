@@ -8,13 +8,8 @@
 
 namespace Everywhere\Api\Contract\Integration;
 
-interface UsersRepositoryInterface
+interface UsersRepositoryInterface extends AuthRepositoryInterface
 {
-    /**
-     * @return int
-     */
-    public function getCurrentUserId();
-
     /**
      * @param array $ids
      * @return array<User>

@@ -1,7 +1,13 @@
 <?php
 namespace Everywhere\Api;
 
+use Everywhere\Api\Auth\AuthenticationAdapter;
+use Everywhere\Api\Auth\AuthenticationService;
+use Everywhere\Api\Auth\AuthenticationStorage;
 use Everywhere\Api\Contract\App\ContainerInterface;
+use Everywhere\Api\Contract\Auth\AuthenticationAdapterInterface;
+use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
+use Everywhere\Api\Contract\Auth\AuthenticationStorageInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
 use Everywhere\Api\Schema\DataLoaderFactory;
@@ -16,6 +22,7 @@ use Everywhere\Api\Schema\Resolvers\QueryResolver;
 use Everywhere\Api\Schema\Resolvers\UserResolver;
 use Everywhere\Api\Schema\Resolvers\PhotoResolver;
 use Everywhere\Api\Schema\Resolvers\CommentResolver;
+use Zend\Authentication\Storage\NonPersistent;
 
 return [
     PromiseAdapter::class => function() {
@@ -55,6 +62,23 @@ return [
     DataLoaderFactoryInterface::class => function(ContainerInterface $container) {
         return new DataLoaderFactory(
             $container[PromiseAdapter::class]
+        );
+    },
+
+    AuthenticationStorageInterface::class => function(ContainerInterface $container) {
+        return new AuthenticationStorage();
+    },
+
+    AuthenticationAdapterInterface::class => function(ContainerInterface $container) {
+        return new AuthenticationAdapter(
+            $container->getIntegration()->getUsersRepository()
+        );
+    },
+
+    AuthenticationServiceInterface::class => function(ContainerInterface $container) {
+        return new AuthenticationService(
+            $container[AuthenticationStorageInterface::class],
+            $container[AuthenticationAdapterInterface::class]
         );
     },
 

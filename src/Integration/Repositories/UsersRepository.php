@@ -15,7 +15,7 @@ class UsersRepository implements UsersRepositoryInterface
 {
     public $counter = 0;
 
-    public function getCurrentUserId()
+    public function authenticate($login, $password)
     {
         return 17;
     }
