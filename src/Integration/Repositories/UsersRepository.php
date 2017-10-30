@@ -15,9 +15,17 @@ class UsersRepository implements UsersRepositoryInterface
 {
     public $counter = 0;
 
-    public function authenticate($login, $password)
+    public function authenticate($identity, $password)
     {
-        return 17;
+        $result = \OW_Auth::getInstance()->authenticate(
+            new \BASE_CLASS_StandardAuth($identity, $password)
+        );
+
+        if (!$result->isValid()) {
+            return null;
+        }
+
+        return $result->getUserId();
     }
 
     public function findByIds($idList)

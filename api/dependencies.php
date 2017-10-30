@@ -9,9 +9,12 @@ use Everywhere\Api\Contract\Auth\AuthenticationAdapterInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationStorageInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
+use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
+use Everywhere\Api\Middleware\JwtMiddleware;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
+use Everywhere\Api\Schema\Resolvers\MutationResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
@@ -22,7 +25,6 @@ use Everywhere\Api\Schema\Resolvers\QueryResolver;
 use Everywhere\Api\Schema\Resolvers\UserResolver;
 use Everywhere\Api\Schema\Resolvers\PhotoResolver;
 use Everywhere\Api\Schema\Resolvers\CommentResolver;
-use Zend\Authentication\Storage\NonPersistent;
 
 return [
     PromiseAdapter::class => function() {
@@ -82,6 +84,16 @@ return [
         );
     },
 
+    AuthMiddleware::class => function(ContainerInterface $container) {
+        return new AuthMiddleware(
+            $container[AuthenticationStorageInterface::class]
+        );
+    },
+
+    JwtMiddleware::class => function(ContainerInterface $container) {
+        return new JwtMiddleware();
+    },
+
     // Resolvers
 
     QueryResolver::class => function(ContainerInterface $container) {
@@ -106,6 +118,12 @@ return [
         return new CommentResolver(
             $container->getIntegration()->getCommentsRepository(),
             $container[DataLoaderFactoryInterface::class]
+        );
+    },
+
+    MutationResolver::class => function(ContainerInterface $container) {
+        return new MutationResolver(
+            $container[AuthenticationServiceInterface::class]
         );
     },
 ];

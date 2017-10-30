@@ -8,12 +8,9 @@
 
 namespace Everywhere\Api\Middleware;
 
-use Everywhere\Api\Contract\Schema\BuilderInterface;
 use GraphQL\Server\ServerConfig;
-use Overblog\DataLoader\Promise\Adapter\Webonyx\GraphQL\SyncPromiseAdapter;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
-
 use GraphQL\Server\StandardServer;
 
 class GraphQLMiddleware

@@ -19,6 +19,12 @@ class Server
 
     public function __construct($baseUrl, IntegrationInterface $integration)
     {
+        /**
+         * There are a lot of nesting invocation in `graphql` schema parsing.
+         * So, have to increase this `xdebug` config.
+         */
+        ini_set('xdebug.max_nesting_level', 200);
+
         $this->baseUrl = $baseUrl;
         $this->integration = $integration;
     }

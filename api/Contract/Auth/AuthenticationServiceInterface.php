@@ -11,7 +11,8 @@ namespace Everywhere\Api\Contract\Auth;
 
 use Zend\Authentication\AuthenticationServiceInterface as ZendAuthenticationServiceInterface;
 
-interface AuthenticationServiceInterface extends ZendAuthenticationServiceInterface
+interface AuthenticationServiceInterface
+    extends ZendAuthenticationServiceInterface, AuthenticationAdatpterAwareInterface
 {
 
 }

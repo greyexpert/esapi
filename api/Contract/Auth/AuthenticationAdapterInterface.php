@@ -8,10 +8,9 @@
 
 namespace Everywhere\Api\Contract\Auth;
 
+use Zend\Authentication\Adapter\ValidatableAdapterInterface;
 
-use Zend\Authentication\Adapter\AdapterInterface;
-
-interface AuthenticationAdapterInterface extends AdapterInterface
+interface AuthenticationAdapterInterface extends ValidatableAdapterInterface
 {
 
 }

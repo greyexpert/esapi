@@ -17,11 +17,8 @@ class AuthenticationAdapter extends Callback implements AuthenticationAdapterInt
 {
     public function __construct(AuthRepositoryInterface $authRepository)
     {
-        $this->setCallback(function() use($authRepository) {
-            return $authRepository->authenticate(
-                $this->getIdentity(),
-                $this->getCredential()
-            );
+        $this->setCallback(function($identity, $credentials) use($authRepository) {
+            return $authRepository->authenticate($identity, $credentials);
         });
     }
 }
