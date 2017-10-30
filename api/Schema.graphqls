@@ -13,7 +13,7 @@ type Query {
 }
 
 type SingInPayload {
-    token: String
+    accessToken: String
     user: User
 }
 

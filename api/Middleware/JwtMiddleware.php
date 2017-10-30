@@ -15,11 +15,11 @@ class JwtMiddleware extends JwtAuthentication
 {
     const ATTRIBUTE_NAME = "token";
 
-    public function __construct()
+    public function __construct($options)
     {
         $options = [
             "secure" => false,
-            "secret" => "secret",
+            "secret" => empty($options["secret"]) ? null : $options["secret"],
             "attribute" => self::ATTRIBUTE_NAME
         ];
 

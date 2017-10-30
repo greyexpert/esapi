@@ -10,6 +10,7 @@ namespace Everywhere\Api\Schema\Resolvers;
 
 
 use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
+use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -20,9 +21,15 @@ class MutationResolver implements ResolverInterface
      */
     protected $authService;
 
-    public function __construct(AuthenticationServiceInterface $authService)
+    /**
+     * @var TokenBuilderInterface
+     */
+    protected $tokenBuilder;
+
+    public function __construct(AuthenticationServiceInterface $authService, TokenBuilderInterface $tokenBuilder)
     {
         $this->authService = $authService;
+        $this->tokenBuilder = $tokenBuilder;
     }
 
     public function resolve($root, $args, $context, ResolveInfo $info)
@@ -41,14 +48,16 @@ class MutationResolver implements ResolverInterface
 
         if (!$result->isValid()) {
             return [
-                "token" => null,
+                "accessToken" => null,
                 "user" => null
             ];
         }
 
+        $identity = $result->getIdentity();
+
         return [
-            "token" => "blablatoken",
-            "user" => $result->getIdentity()
+            "accessToken" => $this->tokenBuilder->build($identity),
+            "user" => $identity
         ];
     }
 }

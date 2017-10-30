@@ -4,10 +4,12 @@ namespace Everywhere\Api;
 use Everywhere\Api\Auth\AuthenticationAdapter;
 use Everywhere\Api\Auth\AuthenticationService;
 use Everywhere\Api\Auth\AuthenticationStorage;
+use Everywhere\Api\Auth\TokenBuilder;
 use Everywhere\Api\Contract\App\ContainerInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationAdapterInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationStorageInterface;
+use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
@@ -91,7 +93,15 @@ return [
     },
 
     JwtMiddleware::class => function(ContainerInterface $container) {
-        return new JwtMiddleware();
+        return new JwtMiddleware(
+            $container->getSettings()["jwt"]
+        );
+    },
+
+    TokenBuilderInterface::class => function(ContainerInterface $container) {
+        return new TokenBuilder(
+            $container->getSettings()["jwt"]
+        );
     },
 
     // Resolvers
@@ -123,7 +133,8 @@ return [
 
     MutationResolver::class => function(ContainerInterface $container) {
         return new MutationResolver(
-            $container[AuthenticationServiceInterface::class]
+            $container[AuthenticationServiceInterface::class],
+            $container[TokenBuilderInterface::class]
         );
     },
 ];
