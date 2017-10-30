@@ -30,7 +30,7 @@ class QueryResolver implements ResolverInterface
 
         switch ($info->fieldName) {
             case "me":
-                $out = $this->usersRepository->getCurrentUserId();
+                $out = $context["viewer"];
                 break;
 
             case "users":

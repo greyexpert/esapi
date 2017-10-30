@@ -9,6 +9,7 @@
 namespace Everywhere\Api\Middleware;
 
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Middleware\JwtAuthentication;
 
 class JwtMiddleware extends JwtAuthentication

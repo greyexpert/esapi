@@ -14,7 +14,7 @@ $app;
 
 $container = $app->getContainer();
 
-$app->add($container[JwtMiddleware::class]);
 $app->add($container[AuthMiddleware::class]);
+$app->add($container[JwtMiddleware::class]);
 
 $app->any("/graphql", $container[GraphQLMiddleware::class]);

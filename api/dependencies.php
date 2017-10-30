@@ -34,7 +34,17 @@ return [
     },
 
     ServerConfig::class => function(ContainerInterface $container) {
+        /**
+         * @var $authService AuthenticationServiceInterface
+         */
+        $authService = $container[AuthenticationServiceInterface::class];
+
         return ServerConfig::create([
+            "context" => function() use($authService) {
+                return [
+                    "viewer" => $authService->getIdentity()
+                ];
+            },
             "debug" => true,
             "schema" => $container[BuilderInterface::class]->build(),
             "promiseAdapter" => $container[PromiseAdapter::class]

@@ -21,7 +21,10 @@ class AuthMiddleware
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next)
     {
         $tokenData = $request->getAttribute(JwtMiddleware::ATTRIBUTE_NAME);
-        $this->authStorage->write($tokenData);
+
+        if (!empty($tokenData)) {
+            $this->authStorage->write($tokenData->data->identity);
+        }
 
         return $next($request, $response);
     }

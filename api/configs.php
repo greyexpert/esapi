@@ -7,6 +7,6 @@ return [
     "schema" => require __DIR__ . '/schema.php',
     "jwt" => [
         "secret" => "qqreq",
-        "lifeTime" => 600
+        "lifeTime" => 6000
     ]
 ];
