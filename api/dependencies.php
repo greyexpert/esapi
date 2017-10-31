@@ -72,7 +72,8 @@ return [
 
     DataLoaderFactoryInterface::class => function(ContainerInterface $container) {
         return new DataLoaderFactory(
-            $container[PromiseAdapter::class]
+            $container[PromiseAdapter::class],
+            $container[ContextInterface::class]
         );
     },
 

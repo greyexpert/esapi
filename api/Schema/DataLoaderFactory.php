@@ -8,6 +8,7 @@
 
 namespace Everywhere\Api\Schema;
 
+use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use Overblog\DataLoader\DataLoader;
@@ -20,9 +21,15 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
      */
     protected $promiseAdapter;
 
-    public function __construct(PromiseAdapter $promiseAdapter)
+    /**
+     * @var ContextInterface
+     */
+    protected $context;
+
+    public function __construct(PromiseAdapter $promiseAdapter, ContextInterface $context)
     {
         $this->promiseAdapter = new WebonyxGraphQLSyncPromiseAdapter($promiseAdapter);
+        $this->context = $context;
     }
 
     public function create(callable $source, $emptyValue = null)
@@ -85,7 +92,7 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
     }
 
     protected function retrieveItems(callable $source, $ids, $args = [], $defaultValue = null) {
-        $dataList = $source($ids, $args);
+        $dataList = $source($ids, $args, $this->context);
         $out = array_fill(0, count($ids), $defaultValue);
 
         foreach ($ids as $index => $id) {
