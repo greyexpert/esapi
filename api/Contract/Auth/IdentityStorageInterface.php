@@ -9,9 +9,13 @@
 namespace Everywhere\Api\Contract\Auth;
 
 
+use Everywhere\Api\Auth\Identity;
 use Zend\Authentication\Storage\StorageInterface;
 
-interface AuthenticationStorageInterface extends StorageInterface
+interface IdentityStorageInterface extends StorageInterface
 {
-
+    /**
+     * @return Identity
+     */
+    public function read();
 }

@@ -9,10 +9,14 @@
 namespace Everywhere\Api\Contract\Auth;
 
 
+use Everywhere\Api\Auth\Identity;
 use Zend\Authentication\AuthenticationServiceInterface as ZendAuthenticationServiceInterface;
 
 interface AuthenticationServiceInterface
     extends ZendAuthenticationServiceInterface, AuthenticationAdatpterAwareInterface
 {
-
+    /**
+     * @return Identity
+     */
+    public function getIdentity();
 }

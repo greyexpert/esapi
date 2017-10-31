@@ -3,7 +3,7 @@
 namespace Everywhere\Api;
 
 use Everywhere\Api\Middleware\AuthMiddleware;
-use Everywhere\Api\Middleware\JwtMiddleware;
+use Everywhere\Api\Middleware\AuthenticationMiddleware;
 use Slim\App;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
 
@@ -14,7 +14,6 @@ $app;
 
 $container = $app->getContainer();
 
-$app->add($container[AuthMiddleware::class]);
-$app->add($container[JwtMiddleware::class]);
+$app->add($container[AuthenticationMiddleware::class]);
 
 $app->any("/graphql", $container[GraphQLMiddleware::class]);

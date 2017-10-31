@@ -53,11 +53,11 @@ class MutationResolver implements ResolverInterface
             ];
         }
 
-        $identity = $result->getIdentity();
+        $identity = $this->authService->getIdentity();
 
         return [
             "accessToken" => $this->tokenBuilder->build($identity),
-            "user" => $identity
+            "user" => $identity->userId
         ];
     }
 }

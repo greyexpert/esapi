@@ -23,21 +23,14 @@ class TokenBuilder implements TokenBuilderInterface
         $this->options = array_merge($this->options, $options);
     }
 
-    public function build($identity, $payload = null)
+    public function build(Identity $identity, $payload = null)
     {
-        return JWT::encode($this->buildPayload([
-            "identity" => $identity,
-            "payload" => $payload
-        ]), $this->options["secret"]);
-    }
+        $now = time();
 
-    protected function buildPayload($payload) {
-        $currentTime = time();
-
-        return [
-            "iat" => time(),
-            "exp" => $currentTime + $this->options["lifeTime"],
-            "data" => $payload
-        ];
+        return JWT::encode([
+            "iat" => $identity->issueTime ?: $now,
+            "exp" => $identity->expirationTime ?: $now + $this->options["lifeTime"],
+            "userId" => $identity->userId
+        ], $this->options["secret"]);
     }
 }

@@ -3,17 +3,17 @@ namespace Everywhere\Api;
 
 use Everywhere\Api\Auth\AuthenticationAdapter;
 use Everywhere\Api\Auth\AuthenticationService;
-use Everywhere\Api\Auth\AuthenticationStorage;
+use Everywhere\Api\Auth\IdentityStorage;
 use Everywhere\Api\Auth\TokenBuilder;
 use Everywhere\Api\Contract\App\ContainerInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationAdapterInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
-use Everywhere\Api\Contract\Auth\AuthenticationStorageInterface;
+use Everywhere\Api\Contract\Auth\IdentityStorageInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
-use Everywhere\Api\Middleware\JwtMiddleware;
+use Everywhere\Api\Middleware\AuthenticationMiddleware;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
 use Everywhere\Api\Schema\Resolvers\MutationResolver;
@@ -42,7 +42,7 @@ return [
         return ServerConfig::create([
             "context" => function() use($authService) {
                 return [
-                    "viewer" => $authService->getIdentity()
+                    "viewer" => $authService->hasIdentity() ? $authService->getIdentity()->userId : null
                 ];
             },
             "debug" => true,
@@ -79,8 +79,8 @@ return [
         );
     },
 
-    AuthenticationStorageInterface::class => function(ContainerInterface $container) {
-        return new AuthenticationStorage();
+    IdentityStorageInterface::class => function(ContainerInterface $container) {
+        return new IdentityStorage();
     },
 
     AuthenticationAdapterInterface::class => function(ContainerInterface $container) {
@@ -91,20 +91,16 @@ return [
 
     AuthenticationServiceInterface::class => function(ContainerInterface $container) {
         return new AuthenticationService(
-            $container[AuthenticationStorageInterface::class],
+            $container[IdentityStorageInterface::class],
             $container[AuthenticationAdapterInterface::class]
         );
     },
 
-    AuthMiddleware::class => function(ContainerInterface $container) {
-        return new AuthMiddleware(
-            $container[AuthenticationStorageInterface::class]
-        );
-    },
-
-    JwtMiddleware::class => function(ContainerInterface $container) {
-        return new JwtMiddleware(
-            $container->getSettings()["jwt"]
+    AuthenticationMiddleware::class => function(ContainerInterface $container) {
+        return new AuthenticationMiddleware(
+            $container->getSettings()["jwt"],
+            $container[IdentityStorageInterface::class],
+            $container[TokenBuilderInterface::class]
         );
     },
 

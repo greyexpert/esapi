@@ -8,6 +8,7 @@
 
 namespace Everywhere\Api\Contract\Auth;
 
+use Everywhere\Api\Auth\Identity;
 
 interface TokenBuilderInterface
 {
@@ -17,5 +18,5 @@ interface TokenBuilderInterface
      *
      * @return string
      */
-    public function build($identity, $payload = null);
+    public function build(Identity $identity, $payload = null);
 }
