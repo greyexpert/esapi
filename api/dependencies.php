@@ -3,11 +3,13 @@ namespace Everywhere\Api;
 
 use Everywhere\Api\Auth\AuthenticationAdapter;
 use Everywhere\Api\Auth\AuthenticationService;
+use Everywhere\Api\Auth\IdentityService;
 use Everywhere\Api\Auth\IdentityStorage;
 use Everywhere\Api\Auth\TokenBuilder;
 use Everywhere\Api\Contract\App\ContainerInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationAdapterInterface;
 use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
+use Everywhere\Api\Contract\Auth\IdentityServiceInterface;
 use Everywhere\Api\Contract\Auth\IdentityStorageInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
@@ -83,9 +85,16 @@ return [
         return new IdentityStorage();
     },
 
+    IdentityServiceInterface::class => function(ContainerInterface $container) {
+        return new IdentityService(
+            $container->getSettings()["jwt"]
+        );
+    },
+
     AuthenticationAdapterInterface::class => function(ContainerInterface $container) {
         return new AuthenticationAdapter(
-            $container->getIntegration()->getUsersRepository()
+            $container->getIntegration()->getUsersRepository(),
+            $container[IdentityServiceInterface::class]
         );
     },
 
@@ -100,6 +109,7 @@ return [
         return new AuthenticationMiddleware(
             $container->getSettings()["jwt"],
             $container[IdentityStorageInterface::class],
+            $container[IdentityServiceInterface::class],
             $container[TokenBuilderInterface::class]
         );
     },

@@ -9,6 +9,7 @@
 namespace Everywhere\Api\Middleware;
 
 use Everywhere\Api\Auth\Identity;
+use Everywhere\Api\Contract\Auth\IdentityServiceInterface;
 use Everywhere\Api\Contract\Auth\IdentityStorageInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Psr\Http\Message\RequestInterface;
@@ -22,40 +23,50 @@ class AuthenticationMiddleware extends JwtAuthentication
     /**
      * @var IdentityStorageInterface
      */
-    protected $storage;
+    protected $identityStorage;
 
     /**
      * @var TokenBuilderInterface
      */
-    protected $builder;
+    protected $tokenBuilder;
 
-    public function __construct($options, IdentityStorageInterface $storage, TokenBuilderInterface $builder)
+    /**
+     * @var IdentityServiceInterface
+     */
+    protected $identityService;
+
+    public function __construct(
+        $options,
+        IdentityStorageInterface $identityStorage,
+        IdentityServiceInterface $identityService,
+        TokenBuilderInterface $tokenBuilder
+    )
     {
         $options = [
             "secure" => false,
             "secret" => empty($options["secret"]) ? null : $options["secret"],
             "attribute" => self::ATTRIBUTE_NAME,
-            "callback" => function($request, $response, $args) use($storage) {
-                $storage->write(
+            "callback" => function($request, $response, $args) use($identityStorage) {
+                $identityStorage->write(
                     empty($args["decoded"]) ? null : $this->createIdentity($args["decoded"])
                 );
             }
         ];
 
-        $this->storage = $storage;
-        $this->builder = $builder;
+        $this->identityStorage = $identityStorage;
+        $this->tokenBuilder = $tokenBuilder;
+        $this->identityService = $identityService;
 
         parent::__construct($options);
     }
 
     protected function createIdentity($tokenData)
     {
-        $identity = new Identity();
-        $identity->issueTime = (int) $tokenData->iat;
-        $identity->expirationTime = (int) $tokenData->exp;
-        $identity->userId = (int) $tokenData->userId;
-
-        return $identity;
+        return $this->identityService->create(
+            $tokenData->userId,
+            $tokenData->iat,
+            $tokenData->exp
+        );
     }
 
     public function decodeToken($token)
@@ -80,10 +91,10 @@ class AuthenticationMiddleware extends JwtAuthentication
     {
         $resultResponse = parent::__invoke($request, $response, $next);
 
-        if (!$this->storage->isEmpty()) {
+        if (!$this->identityStorage->isEmpty()) {
             $resultResponse = $resultResponse->withHeader(
                 $this->getHeader(),
-                $this->builder->build($this->storage->read())
+                $this->tokenBuilder->build($this->identityStorage->read())
             );
         }
 

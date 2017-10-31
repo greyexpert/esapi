@@ -10,25 +10,21 @@ namespace Everywhere\Api\Auth;
 
 
 use Everywhere\Api\Contract\Auth\AuthenticationAdapterInterface;
+use Everywhere\Api\Contract\Auth\IdentityServiceInterface;
 use Everywhere\Api\Contract\Integration\AuthRepositoryInterface;
 use Zend\Authentication\Adapter\Callback;
 
 class AuthenticationAdapter extends Callback implements AuthenticationAdapterInterface
 {
-    public function __construct(AuthRepositoryInterface $authRepository)
+    public function __construct(
+        AuthRepositoryInterface $authRepository,
+        IdentityServiceInterface $identityService
+    )
     {
-        $this->setCallback(function($identity, $credentials) use($authRepository) {
-            return $this->createIdentity(
+        $this->setCallback(function($identity, $credentials) use($authRepository, $identityService) {
+            return $identityService->create(
                 $authRepository->authenticate($identity, $credentials)
             );
         });
-    }
-
-    public function createIdentity($userId)
-    {
-        $identity = new Identity();
-        $identity->userId = $userId;
-
-        return $identity;
     }
 }
