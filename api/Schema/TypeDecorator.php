@@ -40,15 +40,6 @@ class TypeDecorator implements TypeConfigDecoratorInterface
 
         $resolvers = array_map($this->getResolver, $resolverClasses);
 
-        /**
-         * @var $resolver ResolverInterface
-         */
-        $resolver = call_user_func($this->getResolver, $this->resolversMap[$name]);
-
-        if (!$resolver) {
-            return $typeConfig;
-        }
-
         $typeConfig["resolveField"] = function($root, $args, $context, $info) use($resolvers) {
             $out = null;
 
@@ -56,6 +47,10 @@ class TypeDecorator implements TypeConfigDecoratorInterface
              * @var $resolver ResolverInterface
              */
             foreach ($resolvers as $resolver) {
+                if (!$resolver || !$resolver instanceof ResolverInterface) {
+                    continue;
+                }
+
                 $value = $resolver->resolve($root, $args, $context, $info);
 
                 if ($value !== null) {
