@@ -34,6 +34,12 @@ class TypeDecorator implements TypeConfigDecoratorInterface
             return $typeConfig;
         }
 
+        $resolverClasses = is_array($this->resolversMap[$name])
+            ? $this->resolversMap[$name]
+            : [ $this->resolversMap[$name] ];
+
+        $resolvers = array_map($this->getResolver, $resolverClasses);
+
         /**
          * @var $resolver ResolverInterface
          */
@@ -43,8 +49,21 @@ class TypeDecorator implements TypeConfigDecoratorInterface
             return $typeConfig;
         }
 
-        $typeConfig["resolveField"] = function($root, $args, $context, $info) use($resolver) {
-            return $resolver->resolve($root, $args, $context, $info);
+        $typeConfig["resolveField"] = function($root, $args, $context, $info) use($resolvers) {
+            $out = null;
+
+            /**
+             * @var $resolver ResolverInterface
+             */
+            foreach ($resolvers as $resolver) {
+                $value = $resolver->resolve($root, $args, $context, $info);
+
+                if ($value !== null) {
+                    $out = $value;
+                }
+            }
+
+            return $out;
         };
 
         return $typeConfig;
