@@ -12,16 +12,20 @@ use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
 use Everywhere\Api\Contract\Auth\IdentityServiceInterface;
 use Everywhere\Api\Contract\Auth\IdentityStorageInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
+use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
+use Everywhere\Api\Contract\Schema\ViewerInterface;
 use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
 use Everywhere\Api\Middleware\AuthenticationMiddleware;
+use Everywhere\Api\Schema\Context;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
 use Everywhere\Api\Schema\Resolvers\MutationResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
+use Everywhere\Api\Schema\Viewer;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use Overblog\DataLoader\Promise\Adapter\Webonyx\GraphQL\SyncPromiseAdapter;
@@ -36,17 +40,8 @@ return [
     },
 
     ServerConfig::class => function(ContainerInterface $container) {
-        /**
-         * @var $authService AuthenticationServiceInterface
-         */
-        $authService = $container[AuthenticationServiceInterface::class];
-
         return ServerConfig::create([
-            "context" => function() use($authService) {
-                return [
-                    "viewer" => $authService->hasIdentity() ? $authService->getIdentity()->userId : null
-                ];
-            },
+            "context" => $container[ContextInterface::class],
             "debug" => true,
             "schema" => $container[BuilderInterface::class]->build(),
             "promiseAdapter" => $container[PromiseAdapter::class]
@@ -117,6 +112,18 @@ return [
     TokenBuilderInterface::class => function(ContainerInterface $container) {
         return new TokenBuilder(
             $container->getSettings()["jwt"]
+        );
+    },
+
+    ViewerInterface::class => function(ContainerInterface $container) {
+        return new Viewer(
+            $container[AuthenticationServiceInterface::class]
+        );
+    },
+
+    ContextInterface::class => function(ContainerInterface $container) {
+        return new Context(
+            $container[ViewerInterface::class]
         );
     },
 

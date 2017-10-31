@@ -9,6 +9,7 @@
 namespace Everywhere\Api\Schema\Resolvers;
 
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
+use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -24,13 +25,21 @@ class QueryResolver implements ResolverInterface
         $this->usersRepository = $usersRepository;
     }
 
+    /**
+     * @param $root
+     * @param $args
+     * @param ContextInterface $context
+     * @param ResolveInfo $info
+     *
+     * @return array|null
+     */
     public function resolve($root, $args, $context, ResolveInfo $info)
     {
         $out = null;
 
         switch ($info->fieldName) {
             case "me":
-                $out = $context["viewer"];
+                $out = $context->getViewer()->getUserId();
                 break;
 
             case "users":
