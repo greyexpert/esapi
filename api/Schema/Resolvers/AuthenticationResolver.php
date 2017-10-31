@@ -1,20 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: skambalin
- * Date: 30.10.17
- * Time: 10.07
- */
 
 namespace Everywhere\Api\Schema\Resolvers;
 
-
 use Everywhere\Api\Contract\Auth\AuthenticationServiceInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
-use Everywhere\Api\Contract\Schema\ResolverInterface;
-use GraphQL\Type\Definition\ResolveInfo;
+use Everywhere\Api\Contract\Schema\ContextInterface;
+use Everywhere\Api\Schema\CompositeResolver;
 
-class MutationResolver implements ResolverInterface
+class AuthenticationResolver extends CompositeResolver
 {
     /**
      * @var AuthenticationServiceInterface
@@ -28,18 +21,15 @@ class MutationResolver implements ResolverInterface
 
     public function __construct(AuthenticationServiceInterface $authService, TokenBuilderInterface $tokenBuilder)
     {
+        parent::__construct([
+            "signInUser" => [$this, "resolveSignIn"]
+        ]);
+
         $this->authService = $authService;
         $this->tokenBuilder = $tokenBuilder;
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $info)
-    {
-        if ($info->fieldName === "signInUser") {
-            return $this->resolveSignIn($root, $args, $context, $info);
-        }
-    }
-
-    public function resolveSignIn($root, $args, $context, ResolveInfo $info) {
+    public function resolveSignIn($root, $args, ContextInterface $context) {
         $adapter = $this->authService->getAdapter();
         $adapter->setIdentity($args["login"]);
         $adapter->setCredential($args["password"]);

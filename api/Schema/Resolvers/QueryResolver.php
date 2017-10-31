@@ -11,42 +11,21 @@ namespace Everywhere\Api\Schema\Resolvers;
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
 use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
+use Everywhere\Api\Schema\CompositeResolver;
 use GraphQL\Type\Definition\ResolveInfo;
 
-class QueryResolver implements ResolverInterface
+class QueryResolver extends CompositeResolver
 {
-    /**
-     * @var UsersRepositoryInterface
-     */
-    protected $usersRepository;
-
     public function __construct(UsersRepositoryInterface $usersRepository)
     {
-        $this->usersRepository = $usersRepository;
-    }
+        parent::__construct();
 
-    /**
-     * @param $root
-     * @param $args
-     * @param ContextInterface $context
-     * @param ResolveInfo $info
-     *
-     * @return array|null
-     */
-    public function resolve($root, $args, $context, ResolveInfo $info)
-    {
-        $out = null;
+        $this->addFieldResolver("me", function($root, $args, ContextInterface $context) {
+            return $context->getViewer()->getUserId();
+        });
 
-        switch ($info->fieldName) {
-            case "me":
-                $out = $context->getViewer()->getUserId();
-                break;
-
-            case "users":
-                $out = $this->usersRepository->findAllIds($args);
-                break;
-        }
-
-        return $out;
+        $this->addFieldResolver("users", function($root, $args) use($usersRepository) {
+            return $this->usersRepository->findAllIds($args);
+        });
     }
 }

@@ -21,7 +21,7 @@ use Everywhere\Api\Middleware\AuthenticationMiddleware;
 use Everywhere\Api\Schema\Context;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
-use Everywhere\Api\Schema\Resolvers\MutationResolver;
+use Everywhere\Api\Schema\Resolvers\AuthenticationResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
@@ -155,8 +155,8 @@ return [
         );
     },
 
-    MutationResolver::class => function(ContainerInterface $container) {
-        return new MutationResolver(
+    AuthenticationResolver::class => function(ContainerInterface $container) {
+        return new AuthenticationResolver(
             $container[AuthenticationServiceInterface::class],
             $container[TokenBuilderInterface::class]
         );

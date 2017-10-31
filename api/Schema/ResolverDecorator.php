@@ -8,6 +8,7 @@
 
 namespace Everywhere\Api\Schema;
 
+use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -23,7 +24,7 @@ class ResolverDecorator implements ResolverInterface
         $this->resolver = $resolver;
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $info)
+    public function resolve($root, $args, ContextInterface $context, ResolveInfo $info)
     {
         $this->resolver->resolve($root, $args, $context, $info);
     }

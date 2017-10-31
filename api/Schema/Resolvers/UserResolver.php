@@ -9,10 +9,11 @@
 namespace Everywhere\Api\Schema\Resolvers;
 
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
+use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderInterface;
-use Everywhere\Api\Entities\User;
 use Everywhere\Api\Schema\EntityResolver;
+use GraphQL\Executor\Promise\Promise;
 
 class UserResolver extends EntityResolver
 {
@@ -43,29 +44,27 @@ class UserResolver extends EntityResolver
     }
 
     /**
-     * @param User $user
+     * @param $user
      * @param $fieldName
      * @param $args
-     * @return mixed|null
+     * @param ContextInterface $context
+     *
+     * @return Promise|null
      */
-    public function resolveField($user, $fieldName, $args)
+    protected function resolveField($user, $fieldName, $args, ContextInterface $context)
     {
         switch ($fieldName) {
             case "friends":
                 return $this->friendListLoader->load($user->id, $args);
-                break;
 
             case "comments":
                 return $this->commentsLoader->load($user->id, $args);
-                break;
 
             case "photos":
                 return $this->photosLoader->load($user->id, $args);
-                break;
 
             default:
-                return parent::resolveField($user, $fieldName, $args);
-                break;
+                return parent::resolveField($user, $fieldName, $args, $context);
         }
     }
 }

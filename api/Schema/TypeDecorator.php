@@ -10,6 +10,10 @@ namespace Everywhere\Api\Schema;
 
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
+use GraphQL\Error\Error;
+use GraphQL\Error\InvariantViolation;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Utils\Utils;
 
 class TypeDecorator implements TypeConfigDecoratorInterface
 {
@@ -40,7 +44,7 @@ class TypeDecorator implements TypeConfigDecoratorInterface
 
         $resolvers = array_map($this->getResolver, $resolverClasses);
 
-        $typeConfig["resolveField"] = function($root, $args, $context, $info) use($resolvers) {
+        $typeConfig["resolveField"] = function($root, $args, $context, ResolveInfo $info) use($resolvers) {
             $out = null;
 
             /**
@@ -48,7 +52,9 @@ class TypeDecorator implements TypeConfigDecoratorInterface
              */
             foreach ($resolvers as $resolver) {
                 if (!$resolver || !$resolver instanceof ResolverInterface) {
-                    continue;
+                    throw new InvariantViolation(
+                        "Resolver for `" . Utils::printSafe($info->parentType) . "` type was not found or invalid"
+                    );
                 }
 
                 $value = $resolver->resolve($root, $args, $context, $info);
