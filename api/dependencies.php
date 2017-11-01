@@ -21,6 +21,7 @@ use Everywhere\Api\Middleware\AuthenticationMiddleware;
 use Everywhere\Api\Schema\Context;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
+use Everywhere\Api\Schema\DefaultResolver;
 use Everywhere\Api\Schema\Resolvers\AuthenticationResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
@@ -66,7 +67,8 @@ return [
             $container->getSettings()["schema"]["resolvers"],
             function($resolverClass) use ($container) {
                 return $container->has($resolverClass) ? $container[$resolverClass] : null;
-            }
+            },
+            $container[DefaultResolver::class]
         );
     },
 
@@ -129,6 +131,10 @@ return [
     },
 
     // Resolvers
+
+    DefaultResolver::class => function(ContainerInterface $container) {
+        return new DefaultResolver();
+    },
 
     QueryResolver::class => function(ContainerInterface $container) {
         return new QueryResolver($container->getIntegration()->getUsersRepository());

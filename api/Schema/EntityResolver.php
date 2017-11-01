@@ -64,7 +64,7 @@ class EntityResolver extends CompositeResolver
     {
         $value = parent::resolveField($entity, $fieldName, $args, $context);
 
-        if ($value !== null) {
+        if ($value !== $this->undefined()) {
             return $value;
         }
 

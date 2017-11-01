@@ -3,13 +3,11 @@
 namespace Everywhere\Api\Schema;
 
 use Everywhere\Api\Contract\Schema\ContextInterface;
-use Everywhere\Api\Contract\Schema\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
-class CompositeResolver implements ResolverInterface
+class CompositeResolver extends AbstractResolver
 {
     protected $resolvers = [];
-    protected $defaultResolver;
 
     public function __construct(array $resolvers = [])
     {
@@ -25,7 +23,7 @@ class CompositeResolver implements ResolverInterface
 
     protected function resolveField($root, $fieldName, $args, ContextInterface $context) {
         if (empty($this->resolvers[$fieldName])) {
-            return null;
+            return $this->undefined();
         }
 
         return call_user_func($this->resolvers[$fieldName], $root, $args, $context);
