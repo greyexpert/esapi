@@ -28,16 +28,16 @@ class UserResolver extends EntityResolver
 
     public function __construct(UsersRepositoryInterface $usersRepository, DataLoaderFactoryInterface $loaderFactory) {
         parent::__construct(
-            $loaderFactory->create(function($ids) use($usersRepository) {
+            $loaderFactory->create(function($ids, $args, $context) use($usersRepository) {
                 return $usersRepository->findByIds($ids);
             })
         );
 
-        $this->friendListLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+        $this->friendListLoader = $loaderFactory->create(function($ids, $args, $context) use($usersRepository) {
             return $usersRepository->findFriends($ids, $args);
         }, []);
 
-        $this->photosLoader = $loaderFactory->create(function($ids, $args) use($usersRepository) {
+        $this->photosLoader = $loaderFactory->create(function($ids, $args, $context) use($usersRepository) {
             return $usersRepository->findPhotos($ids, $args);
         }, []);
     }
