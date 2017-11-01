@@ -49,13 +49,15 @@ class TypeDecorator implements TypeConfigDecoratorInterface
 
         $resolvers = is_array($resolvers) ? $resolvers : [ $resolvers ];
 
-        return array_map($this->getResolver, $resolvers) ?: [ $this->defaultResolver ];
+        return array_map($this->getResolver, $resolvers);
     }
 
     public function decorate(array $typeConfig)
     {
-        $typeConfig["resolveField"] = function($root, $args, $context, ResolveInfo $info) {
-            $out = Utils::undefined();
+        $undefined = Utils::undefined();
+
+        $typeConfig["resolveField"] = function($root, $args, $context, ResolveInfo $info) use($undefined) {
+            $out = $undefined;
             $resolvers = $this->getResolvers($info->parentType->name, $info->fieldName);
 
             /**
@@ -70,12 +72,12 @@ class TypeDecorator implements TypeConfigDecoratorInterface
 
                 $value = $resolver->resolve($root, $args, $context, $info);
 
-                if ($value !== Utils::undefined()) {
+                if ($value !== $undefined) {
                     $out = $value;
                 }
             }
 
-            return $out === Utils::undefined()
+            return $out === $undefined
                 ? $this->defaultResolver->resolve($root, $args, $context,  $info)
                 : $out;
         };
