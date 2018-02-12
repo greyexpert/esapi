@@ -18,11 +18,12 @@
     ],
 
     "require": {
-        "slim/slim": "^3.8",
+        "slim/slim": "^3.9",
         "webonyx/graphql-php": "dev-master",
         "overblog/dataloader-php": "^0.5.2",
         "tuupola/slim-jwt-auth": "^2.3",
-        "zendframework/zend-authentication": "^2.5"
+        "zendframework/zend-authentication": "^2.5",
+        "pimple/pimple": "^3.2"
     },
     "autoload": {
         "psr-4": {
