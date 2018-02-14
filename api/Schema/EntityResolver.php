@@ -53,4 +53,25 @@ class EntityResolver extends CompositeResolver
             return $this->resolveField($entity, $info->fieldName, $args, $context);
         });
     }
+
+    /**
+     * @param $entity
+     * @param $fieldName
+     * @param $args
+     * @param $context
+     *
+     * @return null
+     */
+    protected function resolveField($entity, $fieldName, $args, ContextInterface $context)
+    {
+        $value = parent::resolveField($entity, $fieldName, $args, $context);
+
+        if ($value !== $this->undefined()) {
+            return $value;
+        }
+
+        return isset($entity->{$fieldName})
+            ? $entity->{$fieldName}
+            : null;
+    }
 }
