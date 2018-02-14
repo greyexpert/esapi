@@ -10,9 +10,8 @@ namespace Everywhere\Api\Schema;
 
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
-use GraphQL\Error\Error;
+use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Error\InvariantViolation;
-use GraphQL\Executor\Executor;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\Utils;
 
@@ -30,11 +29,21 @@ class TypeDecorator implements TypeConfigDecoratorInterface
      */
     protected $defaultResolver;
 
-    public function __construct(array $resolversMap, callable $getResolver, ResolverInterface $defaultResolver)
-    {
+    /**
+     * @var PromiseAdapter
+     */
+    protected $promiseAdapter;
+
+    public function __construct(
+        array $resolversMap,
+        callable $getResolver,
+        ResolverInterface $defaultResolver,
+        PromiseAdapter $promiseAdapter
+    ) {
         $this->resolversMap = $resolversMap;
         $this->getResolver = $getResolver;
         $this->defaultResolver = $defaultResolver;
+        $this->promiseAdapter = $promiseAdapter;
     }
 
     protected function getResolvers($typeName, $fieldName)
@@ -57,7 +66,7 @@ class TypeDecorator implements TypeConfigDecoratorInterface
         $undefined = Utils::undefined();
 
         $typeConfig["resolveField"] = function($root, $args, $context, ResolveInfo $info) use($undefined) {
-            $out = $undefined;
+            $outPromise = $this->promiseAdapter->createFulfilled($undefined);
             $resolvers = $this->getResolvers($info->parentType->name, $info->fieldName);
 
             /**
@@ -70,16 +79,22 @@ class TypeDecorator implements TypeConfigDecoratorInterface
                     );
                 }
 
-                $value = $resolver->resolve($root, $args, $context, $info);
+                $valuePromise = $this->promiseAdapter->createFulfilled(
+                    $resolver->resolve($root, $args, $context, $info)
+                );
 
-                if ($value !== $undefined) {
-                    $out = $value;
-                }
+                $outPromise = $outPromise->then(function($oldValue) use ($undefined, $valuePromise) {
+                    return $valuePromise->then(function($newValue) use ($undefined, $oldValue) {
+                        return $newValue === $undefined ? $oldValue : $newValue;
+                    });
+                });
             }
 
-            return $out === $undefined
-                ? $this->defaultResolver->resolve($root, $args, $context,  $info)
-                : $out;
+            return $outPromise->then(function($out) use ($undefined, $root, $args, $context, $info) {
+                return $out === $undefined
+                    ? $this->defaultResolver->resolve($root, $args, $context, $info)
+                    : $out;
+            });
         };
 
         return $typeConfig;

@@ -42,10 +42,11 @@ return [
 
     ServerConfig::class => function(ContainerInterface $container) {
         return ServerConfig::create([
-            "context" => $container[ContextInterface::class],
             "debug" => true,
+            "queryBatching" => true,
+            "context" => $container[ContextInterface::class],
             "schema" => $container[BuilderInterface::class]->build(),
-            "promiseAdapter" => $container[PromiseAdapter::class]
+            "promiseAdapter" => $container[PromiseAdapter::class],
         ]);
     },
 
@@ -68,7 +69,8 @@ return [
             function($resolverClass) use ($container) {
                 return $container->has($resolverClass) ? $container[$resolverClass] : null;
             },
-            $container[DefaultResolver::class]
+            $container[DefaultResolver::class],
+            $container[PromiseAdapter::class]
         );
     },
 

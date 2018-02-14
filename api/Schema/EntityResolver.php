@@ -37,11 +37,13 @@ class EntityResolver extends CompositeResolver
 
     public function resolve($root, $args, ContextInterface $context, ResolveInfo $info)
     {
+        $id = $root;
         if ($this->isEntity($root)) {
-            $this->entityLoader->prime($root->getId(), $root);
+            $id = $root->getId();
+            $this->entityLoader->prime($id, $root);
         }
 
-        return $this->entityLoader->load($root)->then(function($entity) use ($info, $args, $context) {
+        return $this->entityLoader->load($id)->then(function($entity) use ($info, $args, $context) {
             if (!$this->isEntity($entity)) {
                 throw new InvariantViolation(
                     'Expected an entity object but received: ' . Utils::printSafe($entity)
@@ -50,26 +52,5 @@ class EntityResolver extends CompositeResolver
 
             return $this->resolveField($entity, $info->fieldName, $args, $context);
         });
-    }
-
-    /**
-     * @param $entity
-     * @param $fieldName
-     * @param $args
-     * @param $context
-     *
-     * @return null
-     */
-    protected function resolveField($entity, $fieldName, $args, ContextInterface $context)
-    {
-        $value = parent::resolveField($entity, $fieldName, $args, $context);
-
-        if ($value !== $this->undefined()) {
-            return $value;
-        }
-
-        return isset($entity->{$fieldName})
-            ? $entity->{$fieldName}
-            : null;
     }
 }
