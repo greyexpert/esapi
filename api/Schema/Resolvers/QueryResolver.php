@@ -29,7 +29,10 @@ class QueryResolver extends CompositeResolver
         });
 
         $this->addFieldResolver("user", function($root, $args) use($usersRepository) {
-            return $args["id"];
+            $users = $usersRepository->findByIds([$args["id"]]);
+            $user = reset($users);
+
+            return $user ?: null;
         });
     }
 }

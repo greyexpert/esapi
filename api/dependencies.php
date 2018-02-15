@@ -69,7 +69,6 @@ return [
             function($resolverClass) use ($container) {
                 return $container->has($resolverClass) ? $container[$resolverClass] : null;
             },
-            $container[DefaultResolver::class],
             $container[PromiseAdapter::class]
         );
     },

@@ -25,11 +25,6 @@ class TypeDecorator implements TypeConfigDecoratorInterface
     protected $getResolver;
 
     /**
-     * @var ResolverInterface
-     */
-    protected $defaultResolver;
-
-    /**
      * @var PromiseAdapter
      */
     protected $promiseAdapter;
@@ -37,12 +32,10 @@ class TypeDecorator implements TypeConfigDecoratorInterface
     public function __construct(
         array $resolversMap,
         callable $getResolver,
-        ResolverInterface $defaultResolver,
         PromiseAdapter $promiseAdapter
     ) {
         $this->resolversMap = $resolversMap;
         $this->getResolver = $getResolver;
-        $this->defaultResolver = $defaultResolver;
         $this->promiseAdapter = $promiseAdapter;
     }
 
@@ -61,13 +54,16 @@ class TypeDecorator implements TypeConfigDecoratorInterface
         return array_map($this->getResolver, $resolvers);
     }
 
-    public function decorate(array $typeConfig)
-    {
+    private function decorateField($typeName, $fieldName, $configs) {
         $undefined = Utils::undefined();
+        $resolvers = $this->getResolvers($typeName, $fieldName);
 
-        $typeConfig["resolveField"] = function($root, $args, $context, ResolveInfo $info) use($undefined) {
+        if (empty($resolvers)) {
+            return $configs;
+        }
+
+        $configs["resolve"] = function($root, $args, $context, ResolveInfo $info) use($undefined, $resolvers) {
             $outPromise = $this->promiseAdapter->createFulfilled($undefined);
-            $resolvers = $this->getResolvers($info->parentType->name, $info->fieldName);
 
             /**
              * @var $resolver ResolverInterface
@@ -90,11 +86,23 @@ class TypeDecorator implements TypeConfigDecoratorInterface
                 });
             }
 
-            return $outPromise->then(function($out) use ($undefined, $root, $args, $context, $info) {
-                return $out === $undefined
-                    ? $this->defaultResolver->resolve($root, $args, $context, $info)
-                    : $out;
-            });
+            return $outPromise;
+        };
+
+        return $configs;
+    }
+
+    public function decorate(array $typeConfig)
+    {
+        $typeConfig["fields"] = function() use ($typeConfig) {
+            $fields = is_callable($typeConfig["fields"]) ? $typeConfig["fields"]() : $typeConfig["fields"];
+
+            $out = [];
+            foreach ($fields as $name => $config) {
+                $out[$name] = $this->decorateField($typeConfig["name"], $name, $config);
+            }
+
+            return $out;
         };
 
         return $typeConfig;
