@@ -13,7 +13,6 @@ use Everywhere\Api\Contract\Auth\IdentityServiceInterface;
 use Everywhere\Api\Contract\Auth\IdentityStorageInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Everywhere\Api\Contract\Schema\ContextInterface;
-use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
 use Everywhere\Api\Contract\Schema\ViewerInterface;
 use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
@@ -22,6 +21,7 @@ use Everywhere\Api\Schema\Context;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
 use Everywhere\Api\Schema\DefaultResolver;
+use Everywhere\Api\Schema\EntityLoaderFactory;
 use Everywhere\Api\Schema\Resolvers\AuthenticationResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
@@ -73,8 +73,15 @@ return [
         );
     },
 
-    DataLoaderFactoryInterface::class => function(ContainerInterface $container) {
+    DataLoaderFactory::class => function(ContainerInterface $container) {
         return new DataLoaderFactory(
+            $container[PromiseAdapter::class],
+            $container[ContextInterface::class]
+        );
+    },
+
+    EntityLoaderFactory::class => function(ContainerInterface $container) {
+        return new EntityLoaderFactory(
             $container[PromiseAdapter::class],
             $container[ContextInterface::class]
         );
@@ -144,21 +151,21 @@ return [
     UserResolver::class => function(ContainerInterface $container) {
         return new UserResolver(
             $container->getIntegration()->getUsersRepository(),
-            $container[DataLoaderFactoryInterface::class]
+            $container[DataLoaderFactory::class]
         );
     },
 
     PhotoResolver::class => function(ContainerInterface $container) {
         return new PhotoResolver(
             $container->getIntegration()->getPhotoRepository(),
-            $container[DataLoaderFactoryInterface::class]
+            $container[DataLoaderFactory::class]
         );
     },
 
     CommentResolver::class => function(ContainerInterface $container) {
         return new CommentResolver(
             $container->getIntegration()->getCommentsRepository(),
-            $container[DataLoaderFactoryInterface::class]
+            $container[DataLoaderFactory::class]
         );
     },
 
