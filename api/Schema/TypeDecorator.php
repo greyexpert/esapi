@@ -8,11 +8,15 @@
 
 namespace Everywhere\Api\Schema;
 
+use Everywhere\Api\Contract\Schema\IDFactoryInterface;
+use Everywhere\Api\Contract\Schema\IDObjectInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\Utils;
 
 class TypeDecorator implements TypeConfigDecoratorInterface
@@ -29,14 +33,21 @@ class TypeDecorator implements TypeConfigDecoratorInterface
      */
     protected $promiseAdapter;
 
+    /**
+     * @var IDFactoryInterface
+     */
+    protected $idFactory;
+
     public function __construct(
         array $resolversMap,
         callable $getResolver,
+        IDFactoryInterface $idFactory,
         PromiseAdapter $promiseAdapter
     ) {
         $this->resolversMap = $resolversMap;
         $this->getResolver = $getResolver;
         $this->promiseAdapter = $promiseAdapter;
+        $this->idFactory = $idFactory;
     }
 
     protected function getResolvers($typeName, $fieldName)
@@ -54,16 +65,71 @@ class TypeDecorator implements TypeConfigDecoratorInterface
         return array_map($this->getResolver, $resolvers);
     }
 
-    private function decorateField($typeName, $fieldName, $configs) {
+    protected function getFinalType($wrappedType)
+    {
+        return $wrappedType instanceof WrappingType
+            ? $wrappedType->getWrappedType(true)
+            : $wrappedType;
+    }
+
+    protected function normalizeArgument($value, $configs)
+    {
+        $finalType = $this->getFinalType($configs["type"]);
+
+        if ($finalType instanceof IDType) {
+            $value = is_array($value)
+                ? array_map(function($id) {
+                    return $this->idFactory->createFromGlobalId($id)->getId();
+                }, $value)
+                : $this->idFactory->createFromGlobalId($value)->getId();
+        }
+
+        return $value;
+    }
+
+    protected function normalizeValue($value, ResolveInfo $info)
+    {
+        $finalType = $this->getFinalType($info->returnType);
+
+        if ($finalType instanceof IDType) {
+            return $this->idFactory->create($info->parentType->name, $value);
+        }
+
+        return $value;
+    }
+
+    protected function normalizeRoot($value)
+    {
+        if (is_array($value)) {
+            return array_map(function($value) {
+                return $value instanceof IDObjectInterface ? $value->getId() : $value;
+            }, $value);
+        }
+
+        return $value instanceof IDObjectInterface ? $value->getId() : $value;
+    }
+
+    private function decorateField($parentTypeName, $fieldName, $configs) {
         $undefined = Utils::undefined();
-        $resolvers = $this->getResolvers($typeName, $fieldName);
+        $resolvers = $this->getResolvers($parentTypeName, $fieldName);
 
         if (empty($resolvers)) {
             return $configs;
         }
 
-        $configs["resolve"] = function($root, $args, $context, ResolveInfo $info) use($undefined, $resolvers) {
+        $configs["resolve"] = function($root, $args, $context, ResolveInfo $info) use (
+            $undefined, $configs, $resolvers, $parentTypeName, $fieldName
+        ) {
             $outPromise = $this->promiseAdapter->createFulfilled($undefined);
+
+            $normalizedArgs = [];
+            foreach ($args as $name => $value) {
+                $argConfig = $configs["args"][$name];
+
+                $normalizedArgs[$name] = $this->normalizeArgument($value, $argConfig);
+            }
+
+            $normalizedRoot = $this->normalizeRoot($root);
 
             /**
              * @var $resolver ResolverInterface
@@ -76,7 +142,7 @@ class TypeDecorator implements TypeConfigDecoratorInterface
                 }
 
                 $valuePromise = $this->promiseAdapter->createFulfilled(
-                    $resolver->resolve($root, $args, $context, $info)
+                    $resolver->resolve($normalizedRoot, $normalizedArgs, $context, $info)
                 );
 
                 $outPromise = $outPromise->then(function($oldValue) use ($undefined, $valuePromise) {
@@ -86,7 +152,13 @@ class TypeDecorator implements TypeConfigDecoratorInterface
                 });
             }
 
-            return $outPromise;
+            return $outPromise->then(function($value) use($undefined, $info) {
+                if ($value !== $undefined) {
+                    return $this->normalizeValue($value, $info);
+                }
+
+                return $value;
+            });
         };
 
         return $configs;

@@ -13,6 +13,7 @@ use Everywhere\Api\Contract\Auth\IdentityServiceInterface;
 use Everywhere\Api\Contract\Auth\IdentityStorageInterface;
 use Everywhere\Api\Contract\Auth\TokenBuilderInterface;
 use Everywhere\Api\Contract\Schema\ContextInterface;
+use Everywhere\Api\Contract\Schema\IDFactoryInterface;
 use Everywhere\Api\Contract\Schema\ViewerInterface;
 use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
@@ -22,6 +23,7 @@ use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
 use Everywhere\Api\Schema\DefaultResolver;
 use Everywhere\Api\Schema\EntityLoaderFactory;
+use Everywhere\Api\Schema\IDFactory;
 use Everywhere\Api\Schema\Resolvers\AuthenticationResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
@@ -63,12 +65,17 @@ return [
         );
     },
 
+    IDFactoryInterface::class => function(ContainerInterface $container) {
+        return new IDFactory();
+    },
+
     TypeConfigDecoratorInterface::class => function(ContainerInterface $container) {
         return new TypeDecorator(
             $container->getSettings()["schema"]["resolvers"],
             function($resolverClass) use ($container) {
                 return $container->has($resolverClass) ? $container[$resolverClass] : null;
             },
+            $container[IDFactoryInterface::class],
             $container[PromiseAdapter::class]
         );
     },

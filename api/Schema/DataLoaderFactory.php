@@ -10,6 +10,7 @@ namespace Everywhere\Api\Schema;
 
 use Everywhere\Api\Contract\Schema\ContextInterface;
 use Everywhere\Api\Contract\Schema\DataLoaderFactoryInterface;
+use Everywhere\Api\Contract\Schema\IDFactoryInterface;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use Overblog\DataLoader\DataLoader;
 use Overblog\PromiseAdapter\Adapter\WebonyxGraphQLSyncPromiseAdapter;
@@ -74,7 +75,10 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
             $id = $key;
         }
 
-        return [$id, $args];
+        return [
+            $id,
+            $args
+        ];
     }
 
     protected function createBuckets(array $keys) {
@@ -96,8 +100,9 @@ class DataLoaderFactory implements DataLoaderFactoryInterface
         $out = array_fill(0, count($ids), $defaultValue);
 
         foreach ($ids as $index => $id) {
-            if (array_key_exists($id, $dataList)) {
-                $out[$index] = $dataList[$id];
+            $stringId = (string) $id;
+            if (array_key_exists($stringId, $dataList)) {
+                $out[$index] = $dataList[$stringId];
             }
         }
 
