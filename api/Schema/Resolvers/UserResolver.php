@@ -27,6 +27,11 @@ class UserResolver extends EntityResolver
      */
     protected $photosLoader;
 
+    /**
+     * @var DataLoaderInterface
+     */
+    protected $avatarLoader;
+
     public function __construct(UsersRepositoryInterface $usersRepository, DataLoaderFactoryInterface $loaderFactory) {
         parent::__construct(
             $loaderFactory->create(function($ids, $args, $context) use($usersRepository) {
@@ -41,6 +46,10 @@ class UserResolver extends EntityResolver
         $this->photosLoader = $loaderFactory->create(function($ids, $args, $context) use($usersRepository) {
             return $usersRepository->findPhotos($ids, $args);
         }, []);
+
+        $this->avatarLoader = $loaderFactory->create(function($ids, $args, $context) use($usersRepository) {
+            return $usersRepository->findAvatars($ids, $args);
+        }, null);
     }
 
     /**
@@ -62,6 +71,9 @@ class UserResolver extends EntityResolver
 
             case "photos":
                 return $this->photosLoader->load($user->id, $args);
+
+            case "avatar":
+                return $this->avatarLoader->load($user->id, $args);
 
             default:
                 return parent::resolveField($user, $fieldName, $args, $context);
