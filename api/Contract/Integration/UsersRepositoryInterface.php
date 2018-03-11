@@ -35,4 +35,11 @@ interface UsersRepositoryInterface extends AuthRepositoryInterface
      * @return mixed
      */
     public function findPhotos($ids, array $args);
+
+    /**
+     * @param $ids
+     * @param array $args
+     * @return mixed
+     */
+    public function findAvatars($ids, array $args);
 }

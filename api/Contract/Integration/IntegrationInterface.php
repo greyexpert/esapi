@@ -24,4 +24,9 @@ interface IntegrationInterface
      * @return CommentsRepositoryInterface
      */
     public function getCommentsRepository();
+
+    /**
+     * @return AvatarRepositoryInterface
+     */
+    public function getAvatarRepository();
 }

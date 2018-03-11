@@ -25,6 +25,7 @@ use Everywhere\Api\Schema\DefaultResolver;
 use Everywhere\Api\Schema\EntityLoaderFactory;
 use Everywhere\Api\Schema\IDFactory;
 use Everywhere\Api\Schema\Resolvers\AuthenticationResolver;
+use Everywhere\Api\Schema\Resolvers\AvatarResolver;
 use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
@@ -172,6 +173,13 @@ return [
     CommentResolver::class => function(ContainerInterface $container) {
         return new CommentResolver(
             $container->getIntegration()->getCommentsRepository(),
+            $container[DataLoaderFactory::class]
+        );
+    },
+
+    AvatarResolver::class => function(ContainerInterface $container) {
+        return new AvatarResolver(
+            $container->getIntegration()->getAvatarRepository(),
             $container[DataLoaderFactory::class]
         );
     },

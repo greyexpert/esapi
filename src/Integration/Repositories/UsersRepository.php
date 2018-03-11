@@ -9,6 +9,7 @@
 namespace Everywhere\Oxwall\Integration\Repositories;
 
 use Everywhere\Api\Contract\Integration\UsersRepositoryInterface;
+use Everywhere\Api\Entities\Avatar;
 use Everywhere\Api\Entities\User;
 
 class UsersRepository implements UsersRepositoryInterface
@@ -82,6 +83,22 @@ class UsersRepository implements UsersRepositoryInterface
             $userItems[] = $item["id"];
 
             $out[$userId] = $userItems;
+        }
+
+        return $out;
+    }
+
+    public function findAvatars($ids, array $args)
+    {
+        $avatarService = \BOL_AvatarService::getInstance();
+        $avatars = $avatarService->findByUserIdList($ids);
+        $out = [];
+
+        /**
+         * @var $avatar \BOL_Avatar
+         */
+        foreach ($avatars as $avatar) {
+            $out[$avatar->userId] = $avatar->id;
         }
 
         return $out;

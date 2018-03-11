@@ -23,8 +23,21 @@ type User {
     name: String!
     email: String!
 
+    avatar: Avatar
     friends(offset: Int = 0, count: Int = 10): [User]
     photos(offset: Int = 0, count: Int = 10): [Photo]
+}
+
+
+enum AvatarSize {
+    SMALL
+    MEDIUM
+    BIG
+}
+
+type Avatar {
+    id: ID!
+    url(size: AvatarSize = SMALL): String!
 }
 
 type Photo {

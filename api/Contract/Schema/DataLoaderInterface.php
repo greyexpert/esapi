@@ -21,12 +21,12 @@ interface DataLoaderInterface
     public function load($key, array $args = []);
 
     /**
-     * @param $key
+     * @param $keys
      * @param array $args
      *
      * @return Promise
      */
-    public function loadMany($key, array $args = []);
+    public function loadMany($keys, array $args = []);
 
     /**
      * @param $key
