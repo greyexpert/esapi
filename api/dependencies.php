@@ -18,6 +18,9 @@ use Everywhere\Api\Contract\Schema\ViewerInterface;
 use Everywhere\Api\Middleware\AuthMiddleware;
 use Everywhere\Api\Middleware\GraphQLMiddleware;
 use Everywhere\Api\Middleware\AuthenticationMiddleware;
+use Everywhere\Api\Schema\TypeConfigDecorators\AggregateTypeConfigDecorator;
+use Everywhere\Api\Schema\TypeConfigDecorators\ObjectTypeConfigDecorator;
+use Everywhere\Api\Schema\TypeConfigDecorators\ScalarTypeConfigDecorator;
 use Everywhere\Api\Schema\Context;
 use Everywhere\Api\Schema\DataLoaderFactory;
 use Everywhere\Api\Schema\Builder;
@@ -26,9 +29,9 @@ use Everywhere\Api\Schema\EntityLoaderFactory;
 use Everywhere\Api\Schema\IDFactory;
 use Everywhere\Api\Schema\Resolvers\AuthenticationResolver;
 use Everywhere\Api\Schema\Resolvers\AvatarResolver;
-use Everywhere\Api\Schema\TypeDecorator;
 use Everywhere\Api\Contract\Schema\BuilderInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
+use Everywhere\Api\Schema\Types\Scalars\Date;
 use Everywhere\Api\Schema\Viewer;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Executor\Promise\PromiseAdapter;
@@ -71,14 +74,30 @@ return [
     },
 
     TypeConfigDecoratorInterface::class => function(ContainerInterface $container) {
-        return new TypeDecorator(
+        $resolveClass = function($className) use ($container) {
+            return $container->has($className) ? $container[$className] : null;
+        };
+
+        $scalarTypeDecorator = new ScalarTypeConfigDecorator(
+            $container->getSettings()["schema"]["scalars"],
+            $resolveClass
+        );
+
+        $objectTypeDecorator = new ObjectTypeConfigDecorator(
             $container->getSettings()["schema"]["resolvers"],
-            function($resolverClass) use ($container) {
-                return $container->has($resolverClass) ? $container[$resolverClass] : null;
-            },
+            $resolveClass,
             $container[IDFactoryInterface::class],
             $container[PromiseAdapter::class]
         );
+
+        return new AggregateTypeConfigDecorator([
+            $scalarTypeDecorator,
+            $objectTypeDecorator
+        ]);
+    },
+
+    Date::class => function(ContainerInterface $container) {
+        return new Date();
     },
 
     DataLoaderFactory::class => function(ContainerInterface $container) {
