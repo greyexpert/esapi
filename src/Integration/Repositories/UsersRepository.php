@@ -46,6 +46,7 @@ class UsersRepository implements UsersRepositoryInterface
             $user->id = $userDto->id;
             $user->name = \BOL_UserService::getInstance()->getDisplayName($userDto->id);
             $user->email = $userDto->email;
+            $user->activityTime = (int) $userDto->activityStamp;
 
             $users[$userDto->id] = $user;
         }

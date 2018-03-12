@@ -20,4 +20,9 @@ class User extends AbstractEntity
      * @var string
      */
     public $email;
+
+    /**
+     * @var int
+     */
+    public $activityTime;
 }

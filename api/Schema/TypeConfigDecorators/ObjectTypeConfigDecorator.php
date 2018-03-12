@@ -1,25 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: skambalin
- * Date: 19.10.17
- * Time: 11.56
- */
 
-namespace Everywhere\Api\Schema;
+namespace Everywhere\Api\Schema\TypeConfigDecorators;
 
 use Everywhere\Api\Contract\Schema\IDFactoryInterface;
 use Everywhere\Api\Contract\Schema\IDObjectInterface;
 use Everywhere\Api\Contract\Schema\ResolverInterface;
 use Everywhere\Api\Contract\Schema\TypeConfigDecoratorInterface;
+use Everywhere\Api\Schema\AbstractTypeConfigDecorator;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeKind;
 use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\Utils;
 
-class TypeDecorator implements TypeConfigDecoratorInterface
+class ObjectTypeConfigDecorator extends AbstractTypeConfigDecorator
 {
     protected $resolversMap;
 
@@ -166,6 +163,10 @@ class TypeDecorator implements TypeConfigDecoratorInterface
 
     public function decorate(array $typeConfig)
     {
+        if ($this->getKind($typeConfig) !== NodeKind::OBJECT_TYPE_DEFINITION) {
+            return $typeConfig;
+        }
+
         $typeConfig["fields"] = function() use ($typeConfig) {
             $fields = is_callable($typeConfig["fields"]) ? $typeConfig["fields"]() : $typeConfig["fields"];
 
